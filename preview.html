@@ -1298,21 +1298,23 @@ If you passed only <code>struct node *root</code>, the function would receive a 
 <div class="tag">Info2::Abstract_Data_Types</div>
 <div class="question"><b>Linked List</b> — What is the structure of a singly linked list in C, and how do you access one specific value?</div>
 <b>Structure:</b>
-<pre><code>typedef struct node {
+<pre><code>struct node {
     int value;
     struct node *next;
-} Node;</code></pre>
+};
+
+struct node *root;</code></pre>
 Each node stores:
 <ul>
 <li>a data field (<code>value</code>)</li>
 <li>a pointer to the next node (<code>next</code>)</li>
 </ul>
 The list itself is usually represented by a pointer to the first node:
-<pre><code>Node *head = NULL;</code></pre>
+<pre><code>struct node *root = NULL;</code></pre>
 <b>Access one specific value:</b><br>
 You cannot jump directly to position <code>i</code> like in an array. You must walk node by node.
-<pre><code>int get_at(Node *head, int index) {
-    Node *cur = head;
+<pre><code>int get_at(struct node *root, int index) {
+    struct node *cur = root;
 
     // move index steps forward
     for (int i = 0; i &lt; index; i++) {
@@ -1329,48 +1331,44 @@ You cannot jump directly to position <code>i</code> like in an array. You must w
 <div class="card">
 <div class="tag">Info2::Abstract_Data_Types</div>
 <div class="question"><b>Linked List</b> — How do you populate a linked list with items? Code: create a linked list by adding <code>88</code>, <code>52</code>, and <code>12</code>.</div>
-<b>One simple way:</b> create nodes one after another and link them manually.
+<b>One direct way:</b> allocate the nodes one after another and connect them step by step.
 <pre><code>#include &lt;stdlib.h&gt;
 
-typedef struct node {
+struct node {
     int value;
     struct node *next;
-} Node;
+};
 
-Node *create_example_list(void) {
-    // allocate the three nodes
-    Node *n1 = malloc(sizeof(Node));
-    Node *n2 = malloc(sizeof(Node));
-    Node *n3 = malloc(sizeof(Node));
+struct node *root;
+struct node *p;
 
-    // fill their values
-    n1-&gt;value = 88;
-    n2-&gt;value = 52;
-    n3-&gt;value = 12;
+root = malloc(sizeof(struct node));
+root-&gt;value = 88;
 
-    // link them together: 88 -> 52 -> 12 -> NULL
-    n1-&gt;next = n2;
-    n2-&gt;next = n3;
-    n3-&gt;next = NULL;
+root-&gt;next = malloc(sizeof(struct node));
+p = root-&gt;next;
+p-&gt;value = 52;
 
-    // the head points to the first node
-    return n1;
-}</code></pre>
+p-&gt;next = malloc(sizeof(struct node));
+p = p-&gt;next;
+p-&gt;value = 12;
+
+p-&gt;next = NULL;</code></pre>
 After this, the list is:
-<pre><code>head -> [88] -> [52] -> [12] -> NULL</code></pre>
+<pre><code>root -> [88] -> [52] -> [12] -> NULL</code></pre>
 </div>
 
 <div class="card">
 <div class="tag">Info2::Abstract_Data_Types</div>
 <div class="question"><b>Linked List</b> — How do you count the number of occurrences of an element <code>x</code> in a linked list?</div>
-<pre><code>typedef struct node {
+<pre><code>struct node {
     int value;
     struct node *next;
-} Node;
+};
 
-int count_occurrences(Node *head, int x) {
+int count_occurrences(struct node *head, int x) {
     int count = 0;
-    Node *cur = head;
+    struct node *cur = head;
 
     // walk through the whole list
     while (cur != NULL) {
@@ -1391,13 +1389,13 @@ int count_occurrences(Node *head, int x) {
 <div class="question"><b>Linked List</b> — How do you insert an item at the beginning of a linked list?</div>
 <pre><code>#include &lt;stdlib.h&gt;
 
-typedef struct node {
+struct node {
     int value;
     struct node *next;
-} Node;
+};
 
-void insert_front(Node **head, int x) {
-    Node *new_node = malloc(sizeof(Node));
+void insert_front(struct node **head, int x) {
+    struct node *new_node = malloc(sizeof(struct node));
 
     // fill the new node
     new_node-&gt;value = x;
@@ -1408,7 +1406,7 @@ void insert_front(Node **head, int x) {
     // head now becomes the new node
     *head = new_node;
 }</code></pre>
-<b>Why use <code>Node **head</code>?</b><br>
+<b>Why use <code>struct node **head</code>?</b><br>
 Because inserting at the front changes the head pointer itself.<br>
 <b>Complexity:</b> <code>O(1)</code>.
 </div>
@@ -1416,12 +1414,12 @@ Because inserting at the front changes the head pointer itself.<br>
 <div class="card">
 <div class="tag">Info2::Abstract_Data_Types</div>
 <div class="question"><b>Linked List</b> — How do you append a list <code>L1</code> to a linked list <code>L2</code>? (After the operation, <code>L2</code> should be followed by <code>L1</code>.)</div>
-<pre><code>typedef struct node {
+<pre><code>struct node {
     int value;
     struct node *next;
-} Node;
+};
 
-void append_list(Node **L2, Node *L1) {
+void append_list(struct node **L2, struct node *L1) {
     // if L2 is empty, the result is just L1
     if (*L2 == NULL) {
         *L2 = L1;
@@ -1429,7 +1427,7 @@ void append_list(Node **L2, Node *L1) {
     }
 
     // find the last node of L2
-    Node *cur = *L2;
+    struct node *cur = *L2;
     while (cur-&gt;next != NULL) {
         cur = cur-&gt;next;
     }
@@ -1446,13 +1444,13 @@ void append_list(Node **L2, Node *L1) {
 <div class="question"><b>Linked List</b> — How do you insert a number at the end of a linked list?</div>
 <pre><code>#include &lt;stdlib.h&gt;
 
-typedef struct node {
+struct node {
     int value;
     struct node *next;
-} Node;
+};
 
-void insert_end(Node **head, int x) {
-    Node *new_node = malloc(sizeof(Node));
+void insert_end(struct node **head, int x) {
+    struct node *new_node = malloc(sizeof(struct node));
     new_node-&gt;value = x;
     new_node-&gt;next = NULL;
 
@@ -1463,7 +1461,7 @@ void insert_end(Node **head, int x) {
     }
 
     // otherwise walk to the last node
-    Node *cur = *head;
+    struct node *cur = *head;
     while (cur-&gt;next != NULL) {
         cur = cur-&gt;next;
     }
@@ -1479,14 +1477,14 @@ void insert_end(Node **head, int x) {
 <div class="question"><b>Linked List</b> — How do you delete an element from a linked list? (Delete the first occurrence of <code>x</code>.)</div>
 <pre><code>#include &lt;stdlib.h&gt;
 
-typedef struct node {
+struct node {
     int value;
     struct node *next;
-} Node;
+};
 
-void delete_first(Node **head, int x) {
-    Node *cur = *head;
-    Node *prev = NULL;
+void delete_first(struct node **head, int x) {
+    struct node *cur = *head;
+    struct node *prev = NULL;
 
     // search for the first node whose value is x
     while (cur != NULL &amp;&amp; cur-&gt;value != x) {
@@ -1516,16 +1514,16 @@ void delete_first(Node **head, int x) {
 <div class="question"><b>Linked List</b> — How do you delete an entire linked list?</div>
 <pre><code>#include &lt;stdlib.h&gt;
 
-typedef struct node {
+struct node {
     int value;
     struct node *next;
-} Node;
+};
 
-void delete_list(Node **head) {
-    Node *cur = *head;
+void delete_list(struct node **head) {
+    struct node *cur = *head;
 
     while (cur != NULL) {
-        Node *next = cur-&gt;next;   // save next before freeing cur
+        struct node *next = cur-&gt;next;   // save next before freeing cur
         free(cur);
         cur = next;
     }
@@ -1556,11 +1554,13 @@ So the caller does not keep a dangling pointer to freed memory.<br>
 <div class="tag">Info2::Abstract_Data_Types</div>
 <div class="question"><b>Linked List</b> — Doubly linked list: what is the structure in C, and what is the advantage over a singly linked list?</div>
 <b>Structure:</b>
-<pre><code>typedef struct dnode {
+<pre><code>struct dnode {
     int value;
     struct dnode *prev;
     struct dnode *next;
-} DNode;</code></pre>
+};
+
+struct dnode *root;</code></pre>
 Each node stores:
 <ul>
 <li>its value</li>
@@ -1609,12 +1609,12 @@ The most recently inserted element is the first one removed.
 So if the stack is represented by a pointer to the first node and you pass only that pointer into a function, the function receives a <b>copy</b> of the pointer.
 <br><br>
 Example:
-<pre><code>void push(Node *top, int x) {
+<pre><code>void push(struct node *top, int x) {
     // changing top here changes only the local copy
 }</code></pre>
 If <code>push</code> needs to make a new first node, then the caller's top pointer must change too. Therefore you usually use either:
 <ul>
-<li><b>a pointer to the pointer</b>, e.g. <code>Node **top</code></li>
+<li><b>a pointer to the pointer</b>, e.g. <code>struct node **top</code></li>
 <li><b>or a stack struct / sentinel node</b> whose address stays fixed</li>
 </ul>
 <b>Why a sentinel helps:</b><br>
@@ -1622,7 +1622,7 @@ A sentinel (dummy first node) gives you a stable object whose address never chan
 <br><br>
 <b>Summary:</b>
 <ul>
-<li>Need to change the top pointer itself? Use <code>Node **top</code>.</li>
+<li>Need to change the top pointer itself? Use <code>struct node **top</code>.</li>
 <li>Want a fixed front object? Use a sentinel / wrapper struct.</li>
 </ul>
 </div>
@@ -1632,18 +1632,18 @@ A sentinel (dummy first node) gives you a stable object whose address never chan
 <div class="question"><b>Stack</b> — How do I create a stack, and how do I push and pop an element in C?</div>
 <pre><code>#include &lt;stdlib.h&gt;
 
-typedef struct node {
+struct node {
     int value;
     struct node *next;
-} Node;
+};
 
 // create an empty stack
-Node *create_stack(void) {
+struct node *create_stack(void) {
     return NULL;
 }
 
-void push(Node **top, int x) {
-    Node *new_node = malloc(sizeof(Node));
+void push(struct node **top, int x) {
+    struct node *new_node = malloc(sizeof(struct node));
 
     // new node becomes the new top
     new_node-&gt;value = x;
@@ -1651,9 +1651,9 @@ void push(Node **top, int x) {
     *top = new_node;
 }
 
-int pop(Node **top) {
+int pop(struct node **top) {
     // caller should ensure the stack is not empty
-    Node *tmp = *top;
+    struct node *tmp = *top;
     int x = tmp-&gt;value;
 
     // remove the top node
@@ -1663,11 +1663,11 @@ int pop(Node **top) {
     return x;
 }</code></pre>
 <b>Usage:</b>
-<pre><code>Node *S = create_stack();
+<pre><code>struct node *S = create_stack();
 push(&amp;S, 10);
 push(&amp;S, 20);
 int x = pop(&amp;S);   // x = 20</code></pre>
-<b>Why this works:</b> both <code>push</code> and <code>pop</code> may change the top pointer, so they receive <code>Node **top</code>.
+<b>Why this works:</b> both <code>push</code> and <code>pop</code> may change the top pointer, so they receive <code>struct node **top</code>.
 </div>
 
 <div class="card">
@@ -1838,6 +1838,1087 @@ void insert_ordered(struct node **L, int x) {
 }</code></pre>
 <b>Idea:</b> move forward until you find the first place where the next value is not smaller than <code>x</code>, then splice the new node into that gap.<br>
 <b>Complexity:</b> <code>O(n)</code>.
+</div>
+
+<!-- ===================== BINARY TREES AND BST ===================== -->
+
+<div class="card">
+<div class="tag">Info2::Binary_Trees_BST</div>
+<div class="question"><b>BT vs BST</b> — What is the difference between a binary tree and a binary search tree? Also: what is a min-heap, and how is it different from a BST?</div>
+<b>Binary tree (BT):</b> every node has at most 2 children (left, right). <i>No</i> constraint on the values.
+<br><br>
+<b>Binary search tree (BST):</b> a binary tree with the BST property:
+<ul>
+<li>All values in the LEFT subtree of a node are <b>&lt;</b> the node's value</li>
+<li>All values in the RIGHT subtree are <b>&gt;</b> the node's value</li>
+<li>The property holds <b>recursively</b> for every node</li>
+</ul>
+<b>Min-heap:</b>
+<ul>
+<li>A <b>complete binary tree</b> (filled level by level, left to right), usually stored implicitly in an array.</li>
+<li><b>Heap property:</b> every parent ≤ both its children (max-heap: parent ≥ children).</li>
+</ul>
+<b>Min-heap vs BST — key differences:</b>
+<ul>
+<li>In a min-heap, only the <b>root</b> is guaranteed to be the global minimum. There is <b>no order between siblings</b>, and the left subtree is <b>not</b> "all smaller" than the right.</li>
+<li>In a BST, in-order traversal gives the values in <b>sorted order</b>. In a heap, no traversal yields sorted order.</li>
+<li>Use heaps for <b>priority queues</b> (fast min/max + insert).</li>
+<li>Use BSTs for <b>ordered search</b>, range queries, sorted iteration.</li>
+</ul>
+</div>
+
+<div class="card">
+<div class="tag">Info2::Binary_Trees_BST</div>
+<div class="question"><b>BST</b> — What are the complexities of search, insert, and delete in a BST? (average and worst case)</div>
+All three operations walk <b>one path</b> from the root downward, so they cost <b>O(h)</b> where <code>h</code> is the height of the tree.
+<br><br>
+<table style="border-collapse: collapse;">
+<tr><th style="text-align:left; padding-right:18px;">Operation</th><th style="text-align:left; padding-right:18px;">Average</th><th style="text-align:left;">Worst</th></tr>
+<tr><td>search</td><td><b>O(log n)</b></td><td><b>O(n)</b></td></tr>
+<tr><td>insert</td><td><b>O(log n)</b></td><td><b>O(n)</b></td></tr>
+<tr><td>delete</td><td><b>O(log n)</b></td><td><b>O(n)</b></td></tr>
+</table>
+<br>
+<b>Why?</b>
+<ul>
+<li><b>Balanced / random tree:</b> height ≈ <code>log n</code> → <b>O(log n)</b>.</li>
+<li><b>Degenerate tree</b> (e.g. inserting already-sorted values): the BST becomes a linked list → height ≈ <code>n</code> → <b>O(n)</b>.</li>
+</ul>
+This is exactly why self-balancing trees (AVL, Red-Black) exist: they guarantee <code>h = O(log n)</code> even in the worst case.
+</div>
+
+<div class="card">
+<div class="tag">Info2::Binary_Trees_BST</div>
+<div class="question"><b>Tree traversal</b> — How do <i>inorder</i>, <i>preorder</i>, and <i>postorder</i> walks work? Give the rule for each, and a small C function for each.</div>
+For each traversal you do something at the node (<b>N</b>) and visit the left (<b>L</b>) and right (<b>R</b>) subtrees. The <b>order</b> in which N, L, R are processed is what differs:
+<ul>
+<li><b>Inorder</b> = L, N, R → visit left, then output node, then visit right. <i>For a BST this yields sorted order.</i></li>
+<li><b>Preorder</b> = N, L, R → output node, then visit left, then visit right. <i>Useful for copying a tree, or printing a prefix expression.</i></li>
+<li><b>Postorder</b> = L, R, N → visit left, then visit right, then output node. <i>Useful when children must be processed before the parent</i> (deleting a tree, computing height bottom-up).</li>
+</ul>
+<b>C code:</b>
+<pre><code>struct node {
+    int value;
+    struct node *left;
+    struct node *right;
+};
+
+void inorder(struct node *root) {
+    if (root == NULL) return;
+    inorder(root-&gt;left);
+    printf("%d ", root-&gt;value);
+    inorder(root-&gt;right);
+}
+
+void preorder(struct node *root) {
+    if (root == NULL) return;
+    printf("%d ", root-&gt;value);
+    preorder(root-&gt;left);
+    preorder(root-&gt;right);
+}
+
+void postorder(struct node *root) {
+    if (root == NULL) return;
+    postorder(root-&gt;left);
+    postorder(root-&gt;right);
+    printf("%d ", root-&gt;value);
+}</code></pre>
+<b>Complexity:</b> <code>O(n)</code> for all three (every node is visited once).
+</div>
+
+<div class="card">
+<div class="tag">Info2::Binary_Trees_BST</div>
+<div class="question"><b>BST</b> — With a BST, how do you get an ordered output (small to large)? With which traversal?</div>
+Use <b>INORDER</b> traversal.
+<br><br>
+<b>Why does it work?</b><br>
+By the BST property:
+<ul>
+<li>All values in the left subtree are smaller than the root.</li>
+<li>All values in the right subtree are larger than the root.</li>
+</ul>
+Inorder visits L → N → R, so it prints all smaller values first, then the node, then all larger values. Applied recursively, this gives <b>ascending order</b>.
+<br><br>
+<b>For descending order:</b> do a "reverse inorder" → R, N, L.
+</div>
+
+<div class="card">
+<div class="tag">Info2::Binary_Trees_BST</div>
+<div class="question"><b>BST</b> — Search for a value <code>x</code> in a BST in C. Write both the iterative and the recursive version.</div>
+<b>Idea:</b> compare <code>x</code> with the current node's value:
+<ul>
+<li>equal → found</li>
+<li>smaller → go left</li>
+<li>larger → go right</li>
+<li>NULL → not found</li>
+</ul>
+<pre><code>struct node {
+    int value;
+    struct node *left;
+    struct node *right;
+};
+
+// recursive
+struct node *bst_search(struct node *root, int x) {
+    if (root == NULL || root-&gt;value == x) {
+        return root;
+    }
+    if (x &lt; root-&gt;value) {
+        return bst_search(root-&gt;left, x);
+    }
+    return bst_search(root-&gt;right, x);
+}
+
+// iterative
+struct node *bst_search_iter(struct node *root, int x) {
+    struct node *cur = root;
+    while (cur != NULL &amp;&amp; cur-&gt;value != x) {
+        if (x &lt; cur-&gt;value) {
+            cur = cur-&gt;left;
+        } else {
+            cur = cur-&gt;right;
+        }
+    }
+    return cur;   // NULL if x is not in the tree
+}</code></pre>
+<b>Complexity:</b> <code>O(h)</code> → average <code>O(log n)</code>, worst <code>O(n)</code>.
+</div>
+
+<div class="card">
+<div class="tag">Info2::Binary_Trees_BST</div>
+<div class="question"><b>BST</b> — How do you find the minimum of a BST? (conceptually, no code)</div>
+Walk down the <b>left spine</b> of the tree:
+<ul>
+<li>Start at the root.</li>
+<li>Keep following the <code>left</code> pointer.</li>
+<li>The first node whose <code>left</code> is NULL is the minimum.</li>
+</ul>
+<b>Why?</b> By the BST property, every left subtree contains only smaller values. So the smallest value in the entire tree must be the <b>leftmost</b> node reachable from the root.
+<br><br>
+<b>Maximum:</b> symmetric — walk down the <b>right</b> spine.
+<br><br>
+<b>Complexity:</b> <code>O(h)</code>.
+</div>
+
+<div class="card">
+<div class="tag">Info2::Binary_Trees_BST</div>
+<div class="question"><b>BST</b> — Code: count the number of occurrences of <code>x</code> in a BST. The function must return how many times <code>x</code> appears in the tree (so it must also handle duplicates correctly).</div>
+<b>Idea:</b>
+<ul>
+<li>If <code>x</code> is smaller than the current node, only the LEFT subtree can contain <code>x</code> → recurse left.</li>
+<li>If <code>x</code> is larger than the current node, only the RIGHT subtree can contain <code>x</code> → recurse right.</li>
+<li>If <code>x</code> equals the current node's value: count this match as <b>1</b>, and (since the BST may carry duplicates on either side) also continue searching in <b>both</b> subtrees.</li>
+</ul>
+<pre><code>struct node {
+    int value;
+    struct node *left;
+    struct node *right;
+};
+
+int count_occurrences(struct node *root, int x) {
+    // base case: empty subtree contains 0 occurrences
+    if (root == NULL) return 0;
+
+    // x lies strictly left of root → only the left subtree can hold x
+    if (x &lt; root-&gt;value) {
+        return count_occurrences(root-&gt;left, x);
+    }
+
+    // x lies strictly right of root → only the right subtree can hold x
+    if (x &gt; root-&gt;value) {
+        return count_occurrences(root-&gt;right, x);
+    }
+
+    // x == root-&gt;value : this node counts as 1.
+    // duplicates may live in either subtree, so check both.
+    return 1 + count_occurrences(root-&gt;left, x)
+             + count_occurrences(root-&gt;right, x);
+}</code></pre>
+<b>Complexity:</b>
+<ul>
+<li><b>No duplicates of x:</b> <code>O(h)</code> — average <code>O(log n)</code>, worst <code>O(n)</code>.</li>
+<li><b>With many duplicates of x:</b> up to <code>O(n)</code> because each match forces recursion into both subtrees.</li>
+</ul>
+</div>
+
+<div class="card">
+<div class="tag">Info2::Binary_Trees_BST</div>
+<div class="question"><b>BST</b> — What is the <i>successor</i> of a node? Name the 2 cases for finding the successor (conceptual). Then code it (no parent pointer — walk down from the root).</div>
+<b>Successor of x:</b> the node with the <b>smallest value that is still &gt; x's value</b> — equivalently, the node that comes <i>right after x</i> in an inorder traversal.
+<br><br>
+<b>2 cases:</b>
+<ol>
+<li><b>x has a right subtree</b> → the successor is the <b>minimum of the right subtree</b> (its leftmost node).</li>
+<li><b>x has no right subtree</b> → walk <b>down from the root</b> toward x. Each time you go LEFT, remember the current node as a candidate successor (<code>succ</code>). The last such candidate when you reach x is the successor. If you never went left, x is the maximum and has no successor.</li>
+</ol>
+<b>C code:</b>
+<pre><code>struct node {
+    int value;
+    struct node *left;
+    struct node *right;
+};
+
+struct node *bst_min(struct node *root) {
+    if (root == NULL) return NULL;
+    while (root-&gt;left != NULL) {
+        root = root-&gt;left;
+    }
+    return root;
+}
+
+// root = root of the whole tree, x = the node whose successor we want
+struct node *successor(struct node *root, struct node *x) {
+    // case 1: x has a right subtree → minimum of that right subtree
+    if (x-&gt;right != NULL) {
+        return bst_min(x-&gt;right);
+    }
+
+    // case 2: no right subtree → walk down from the root toward x,
+    // remembering the latest node we went LEFT from.
+    struct node *p    = root;
+    struct node *succ = NULL;
+
+    while (p != x) {
+        if (x-&gt;value &lt; p-&gt;value) {
+            // x lies in p's left subtree → p is a candidate successor
+            succ = p;
+            p = p-&gt;left;
+        } else {
+            // x lies in p's right subtree → p is NOT a candidate
+            p = p-&gt;right;
+        }
+    }
+
+    return succ;   // NULL if x was the maximum (we never went left)
+}</code></pre>
+<b>Why case 2 works:</b> the successor of x must be an ancestor of x for which x sits in its LEFT subtree (so x is smaller than that ancestor, and no smaller ancestor with x in its left subtree exists below it). Each time we go left on the way down, we record the current node — the last one recorded is exactly that lowest ancestor.
+<br><br>
+<b>Complexity:</b> <code>O(h)</code>.
+</div>
+
+<div class="card">
+<div class="tag">Info2::Binary_Trees_BST</div>
+<div class="question"><b>BST</b> — Code: how do you insert a <code>struct node *p</code> into a BST? Use a <i>one-step-delayed-pointer</i>. Explain the core idea first.</div>
+<b>Core idea (one-step-delayed-pointer):</b>
+<ul>
+<li>Walk down the tree from the root with a current pointer <code>x</code>.</li>
+<li>Keep a second pointer <code>y</code> that is always <b>one step behind</b> <code>x</code> — so <code>y</code> is the parent of <code>x</code>.</li>
+<li>When <code>x</code> falls off the tree (becomes NULL), <code>y</code> is exactly the parent of the empty slot.</li>
+<li>Attach <code>p</code> as the left or right child of <code>y</code>, depending on how <code>p-&gt;value</code> compares with <code>y-&gt;value</code>.</li>
+<li>Return the (possibly new) root <code>r</code>.</li>
+</ul>
+<b>C code (matches the textbook signature: returns the new root):</b>
+<pre><code>struct node {
+    int value;
+    struct node *left;
+    struct node *right;
+};
+
+// p = new node to insert (with p-&gt;left = p-&gt;right = NULL)
+// r = current root of the BST (may be NULL if the tree is empty)
+// returns the (possibly new) root of the BST
+struct node *BSTreeInsert(struct node *p, struct node *r) {
+
+    struct node *y = NULL;   // y is one step delayed → will end up as p's parent
+    struct node *x = r;      // x walks down from the root
+
+    // walk down until x runs off the tree
+    while (x != NULL) {
+        y = x;   // remember x as the parent of the next step
+
+        if (x-&gt;value &lt; p-&gt;value) {
+            // new value belongs to the RIGHT of x → go right
+            x = x-&gt;right;
+        } else {
+            // new value belongs to the LEFT of x → go left
+            x = x-&gt;left;
+        }
+    }
+
+    // attach p in the correct slot under y
+    if (y == NULL) {
+        // tree was empty → p becomes the new root
+        r = p;
+    } else if (y-&gt;value &lt; p-&gt;value) {
+        // p is larger than y → right child of y
+        y-&gt;right = p;
+    } else {
+        // p is smaller (or equal) than y → left child of y
+        y-&gt;left = p;
+    }
+
+    return r;
+}</code></pre>
+<b>Typical call:</b> <code>root = BSTreeInsert(new_node, root);</code><br>
+<b>Complexity:</b> <code>O(h)</code>.
+</div>
+
+<div class="card">
+<div class="tag">Info2::Binary_Trees_BST</div>
+<div class="question"><b>BST</b> — How do you delete a node in a BST? Explain the 3 cases (conceptual), then code: delete <code>struct node *x</code> from a BST.</div>
+<b>3 cases</b> by the number of children of the node to delete:
+<ol>
+<li><b>x is a leaf</b> (no children) → simply remove x. Its parent's pointer to it becomes NULL.</li>
+<li><b>x has exactly one child</b> → replace x with that child in its parent's pointer slot.</li>
+<li><b>x has two children</b> → replace x's <i>value</i> with the value of its <b>inorder successor</b> (= minimum of x's right subtree). Then recursively delete that successor in the right subtree (the successor has at most one child, so this falls into case 1 or 2).</li>
+</ol>
+<b>C code (line-by-line comments, book style with <code>q = p; p = p-&gt;right; free(q)</code>):</b>
+<pre><code>struct node {
+    int value;
+    struct node *left;
+    struct node *right;
+};
+
+// helper: smallest node in a subtree (leftmost node)
+struct node *bst_min(struct node *root) {
+    // walk down the LEFT spine until there is no more left child
+    while (root-&gt;left != NULL) root = root-&gt;left;
+    return root;
+}
+
+// deletes the node with value x from the BST whose root pointer is *p.
+// p is a pointer-to-pointer so we can OVERWRITE *p directly in place;
+// this writes through to the caller's pointer (e.g. the parent's
+// left/right slot, or the top-level root pointer).
+// usage at the top level:   bst_delete(&amp;root, x);
+void bst_delete(struct node **p, int x) {
+
+    // 1) base case: x is not in the tree → nothing to do
+    if (*p == NULL) return;
+
+    // 2) navigate: same comparisons as in BST search
+    if (x &lt; (*p)-&gt;value) {
+        // x must be in the LEFT subtree (BST property)
+        // recurse on the ADDRESS of the left-child pointer so that
+        // the recursive call can rewrite it if needed
+        bst_delete(&amp;(*p)-&gt;left, x);
+
+    } else if (x &gt; (*p)-&gt;value) {
+        // x must be in the RIGHT subtree (BST property)
+        bst_delete(&amp;(*p)-&gt;right, x);
+
+    } else {
+        // 3) found the node to delete: (*p)-&gt;value == x
+
+        // --- CASE 1 + CASE 2 : the node has at most one child ---
+
+        // case (a): no left child → replace *p with its right child
+        // (this also handles the leaf case: then (*p)-&gt;right is NULL,
+        //  so *p becomes NULL — exactly what removing a leaf means)
+        if ((*p)-&gt;left == NULL) {
+            struct node *q = *p;          // q = remember the doomed node
+            *p = (*p)-&gt;right;             // parent slot now points to right child
+            free(q);                       // delete the old node
+            return;
+        }
+
+        // case (b): no right child → replace *p with its left child
+        if ((*p)-&gt;right == NULL) {
+            struct node *q = *p;          // q = remember the doomed node
+            *p = (*p)-&gt;left;              // parent slot now points to left child
+            free(q);                       // delete the old node
+            return;
+        }
+
+        // --- CASE 3 : the node has TWO children ---
+
+        // find the inorder successor: the minimum of the right subtree.
+        // this node is guaranteed to have NO left child (leftmost) and
+        // therefore has at most one child → easy to remove later.
+        struct node *tmp = bst_min((*p)-&gt;right);
+
+        // copy ONLY the VALUE of the successor into the current node.
+        // the structural node we want to remove is now "tmp" but its
+        // value already lives here, so the BST still looks correct.
+        (*p)-&gt;value = tmp-&gt;value;
+
+        // delete the successor node from the right subtree.
+        // since the successor has at most one child, this recursive
+        // call hits CASE 1 or CASE 2 and terminates quickly.
+        bst_delete(&amp;(*p)-&gt;right, tmp-&gt;value);
+    }
+}</code></pre>
+<b>Complexity:</b> <code>O(h)</code>.
+</div>
+
+<div class="card">
+<div class="tag">Info2::Binary_Trees_BST</div>
+<div class="question"><b>BST</b> — Code: write a function that determines the height of a BST. What is the asymptotic complexity?</div>
+<b>Convention used here:</b>
+<ul>
+<li>height of an empty tree = <code>-1</code></li>
+<li>height of a single-node tree = <code>0</code></li>
+</ul>
+<pre><code>struct node {
+    int value;
+    struct node *left;
+    struct node *right;
+};
+
+int max(int a, int b) {
+    if (a &gt; b) return a;
+    return b;
+}
+
+int height(struct node *root) {
+    // base case: empty subtree
+    if (root == NULL) return -1;
+
+    // recurse into both subtrees
+    int lh = height(root-&gt;left);
+    int rh = height(root-&gt;right);
+
+    // height of this node = 1 + height of taller child
+    return 1 + max(lh, rh);
+}</code></pre>
+<b>Complexity:</b>
+<ul>
+<li><b>Time:</b> <b>O(n)</b> — every node is visited exactly once and does O(1) work.</li>
+<li><b>Space:</b> <b>O(h)</b> for the recursion stack (= O(log n) average, O(n) worst).</li>
+</ul>
+<b>Note on conventions:</b> some courses define height of an empty tree as 0 (then leaf = 1). Match the convention your prof uses.
+</div>
+
+<div class="card">
+<div class="tag">Info2::Binary_Trees_BST</div>
+<div class="question"><b>Search strategies</b> — Explain <i>Breadth-First Search (BFS)</i> vs <i>Depth-First Search (DFS)</i>. What problems is each used for?</div>
+<b>BFS — Breadth-First Search:</b>
+<ul>
+<li>Explores all nodes at the current depth <i>before</i> going deeper.</li>
+<li>Visits the tree / graph <b>level by level</b>.</li>
+<li>Uses a <b>queue (FIFO)</b>.</li>
+</ul>
+<b>BFS is used for:</b>
+<ul>
+<li>Shortest path in an <b>unweighted</b> graph (counted in edges).</li>
+<li>Finding the closest match to a source.</li>
+<li>Level-order tree traversal.</li>
+<li>Connected components in undirected graphs.</li>
+</ul>
+<b>DFS — Depth-First Search:</b>
+<ul>
+<li>Goes as <b>deep</b> as possible along each branch, then backtracks.</li>
+<li>Uses a <b>stack (LIFO)</b> — explicitly, or implicitly via recursion.</li>
+<li>The three tree traversals (inorder, preorder, postorder) are all DFS.</li>
+</ul>
+<b>DFS is used for:</b>
+<ul>
+<li>Detecting <b>cycles</b> in a graph.</li>
+<li><b>Topological sort</b> of a DAG.</li>
+<li>Path existence between two nodes.</li>
+<li>All standard tree traversals (inorder / preorder / postorder).</li>
+<li>Maze / puzzle solving by exploring full paths.</li>
+<li>Finding strongly connected components (Tarjan, Kosaraju).</li>
+</ul>
+<b>Quick comparison:</b>
+<table style="border-collapse: collapse;">
+<tr><th style="text-align:left; padding-right:18px;"></th><th style="text-align:left; padding-right:18px;">BFS</th><th style="text-align:left;">DFS</th></tr>
+<tr><td>structure</td><td>queue</td><td>stack / recursion</td></tr>
+<tr><td>order</td><td>level by level</td><td>deep first</td></tr>
+<tr><td>shortest path (unweighted)</td><td>YES</td><td>no</td></tr>
+<tr><td>memory</td><td>O(width)</td><td>O(height)</td></tr>
+</table>
+</div>
+
+<!-- ===================== AVL TREES ===================== -->
+
+<div class="card">
+<div class="tag">Info2::AVL_Trees</div>
+<div class="question"><b>AVL</b> — What is the balancing rule behind the AVL tree?</div>
+For <b>every</b> node <code>v</code> in the tree, the <b>balance factor</b> satisfies:
+<ul>
+<li><code>bf(v) = height(left subtree) − height(right subtree)</code></li>
+<li><code>|bf(v)| ≤ 1</code></li>
+</ul>
+i.e. the heights of the left and right subtree differ by at most <b>1</b>. The condition must hold <b>recursively</b> for every node.
+<br><br>
+<b>Height convention used here:</b>
+<ul>
+<li><code>height(NULL) = −1</code></li>
+<li><code>height(leaf) = 0</code></li>
+</ul>
+With this convention, the balance factor of a leaf is <code>0</code> and the height is computed by <code>1 + max(height(left), height(right))</code>.
+</div>
+
+<div class="card">
+<div class="tag">Info2::AVL_Trees</div>
+<div class="question"><b>AVL</b> — Fill in the blanks. <i>AVL trees guarantee ___ complexity for all operations. The height of an AVL tree with n nodes is always ___.</i> What is so special about the height of an AVL tree?</div>
+<b>Guarantees:</b>
+<ul>
+<li>AVL trees guarantee <b>O(log n)</b> worst-case complexity for <b>search</b>, <b>insert</b>, and <b>delete</b>.</li>
+<li>The height of an AVL tree with <code>n</code> nodes is always <b>Θ(log n)</b>.<br>
+More precisely: <code>h ≤ 1.44 · log₂(n + 2)</code>.</li>
+</ul>
+<b>Why is this special?</b>
+<ul>
+<li>A plain BST can degenerate to height <code>O(n)</code> for bad insertion orders (e.g. inserting sorted input → linked list).</li>
+<li>The AVL balancing property <b>forces</b> the height to stay logarithmic no matter what sequence of insertions/deletions is applied.</li>
+<li>This is what makes search/insert/delete <b>guaranteed</b> <code>O(log n)</code> — not just on average.</li>
+</ul>
+</div>
+
+<div class="card">
+<div class="tag">Info2::AVL_Trees</div>
+<div class="question"><b>AVL</b> — What is the structure of an AVL tree node in C? What is the difference compared to a BST node?</div>
+An AVL node is a BST node with <b>one extra field</b>: the cached height (or, equivalently, the balance factor).
+<pre><code>struct node {
+    int value;
+    int height;            // &lt;-- new: cached height for fast rebalancing
+    struct node *left;
+    struct node *right;
+};
+
+// returns -1 for NULL so the recursive height formula works for leaves
+int height(struct node *p) {
+    if (p == NULL) return -1;
+    return p-&gt;height;
+}
+
+int max(int a, int b) {
+    if (a &gt; b) return a;
+    return b;
+}</code></pre>
+<b>Difference vs BST:</b> only the extra <code>height</code> field. Some implementations store the <i>balance factor</i> directly instead — both approaches work; storing the height is slightly more flexible.
+</div>
+
+<div class="card">
+<div class="tag">Info2::AVL_Trees</div>
+<div class="question"><b>AVL</b> — When do you perform a right rotation? Code the algorithm for right rotation.</div>
+<b>When?</b> When a node's <b>LEFT subtree is too tall</b> and the left child is itself <i>left-heavy or balanced</i> (LL case). A right rotation pulls the left child upward.
+<br><br>
+<b>Picture:</b>
+<pre><code>     y                    x
+    / \                  / \
+   x   T3       →       T1  y
+  / \                       / \
+ T1  T2                    T2  T3</code></pre>
+<b>C code:</b>
+<pre><code>struct node *right_rotate(struct node *y) {
+    struct node *x  = y-&gt;left;
+    struct node *T2 = x-&gt;right;
+
+    // perform rotation: x moves up, y moves down to x's right
+    x-&gt;right = y;
+    y-&gt;left  = T2;
+
+    // update heights — lowest node FIRST
+    y-&gt;height = 1 + max(height(y-&gt;left), height(y-&gt;right));
+    x-&gt;height = 1 + max(height(x-&gt;left), height(x-&gt;right));
+
+    return x;   // x is the new root of this subtree
+}</code></pre>
+</div>
+
+<div class="card">
+<div class="tag">Info2::AVL_Trees</div>
+<div class="question"><b>AVL</b> — When do you perform a left rotation? Code the algorithm for left rotation.</div>
+<b>When?</b> When a node's <b>RIGHT subtree is too tall</b> and the right child is itself <i>right-heavy or balanced</i> (RR case). A left rotation pulls the right child upward.
+<br><br>
+<b>Picture:</b>
+<pre><code>    x                        y
+   / \                      / \
+  T1  y           →        x   T3
+     / \                  / \
+    T2  T3               T1  T2</code></pre>
+<b>C code:</b>
+<pre><code>struct node *left_rotate(struct node *x) {
+    struct node *y  = x-&gt;right;
+    struct node *T2 = y-&gt;left;
+
+    // perform rotation: y moves up, x moves down to y's left
+    y-&gt;left  = x;
+    x-&gt;right = T2;
+
+    // update heights — lowest node FIRST
+    x-&gt;height = 1 + max(height(x-&gt;left), height(x-&gt;right));
+    y-&gt;height = 1 + max(height(y-&gt;left), height(y-&gt;right));
+
+    return y;   // y is the new root of this subtree
+}</code></pre>
+</div>
+
+<div class="card">
+<div class="tag">Info2::AVL_Trees</div>
+<div class="question"><b>AVL</b> — When do you perform a left-right rotation? When a right-left rotation? Code both fully.</div>
+<b>LR rotation — when?</b> When a node's <b>LEFT subtree is too tall</b> but the <b>left child is RIGHT-heavy</b>. A single right rotation is not enough — we first <i>left-rotate</i> the left child (which turns LR into LL), then <i>right-rotate</i> the node.
+<br><br>
+<b>LR picture:</b>
+<pre><code>     z                  z                    y
+    / \                / \                  / \
+   x   T4             y   T4               x   z
+  / \      →         / \         →        / \ / \
+ T1  y              x   T3              T1 T2 T3 T4
+    / \            / \
+   T2  T3         T1  T2</code></pre>
+<b>LR code:</b>
+<pre><code>struct node *left_right_rotate(struct node *p) {
+    // step 1: left-rotate the left child → now LL shape
+    p-&gt;left = left_rotate(p-&gt;left);
+
+    // step 2: right-rotate p
+    return right_rotate(p);
+}</code></pre>
+<br>
+<b>RL rotation — when?</b> When a node's <b>RIGHT subtree is too tall</b> but the <b>right child is LEFT-heavy</b>. Mirror of LR: first <i>right-rotate</i> the right child (which turns RL into RR), then <i>left-rotate</i> the node.
+<br><br>
+<b>RL picture:</b>
+<pre><code>   z                    z                       y
+  / \                  / \                     / \
+ T1  x                T1  y                   z   x
+    / \      →           / \       →        / \ / \
+   y   T4               T2  x              T1 T2 T3 T4
+  / \                       / \
+ T2  T3                    T3  T4</code></pre>
+<b>RL code:</b>
+<pre><code>struct node *right_left_rotate(struct node *p) {
+    // step 1: right-rotate the right child → now RR shape
+    p-&gt;right = right_rotate(p-&gt;right);
+
+    // step 2: left-rotate p
+    return left_rotate(p);
+}</code></pre>
+<b>In practice</b> these are usually inlined inside <code>AVLrebalance</code> rather than written as standalone functions.
+</div>
+
+<div class="card">
+<div class="tag">Info2::AVL_Trees</div>
+<div class="question"><b>AVL</b> — After an insertion, there are 4 cases that can violate the AVL property. Name them and the fix for each.</div>
+<table style="border-collapse: collapse;">
+<tr>
+  <th style="text-align:left; padding-right:18px;">Case</th>
+  <th style="text-align:left; padding-right:18px;">Trigger</th>
+  <th style="text-align:left; padding-right:18px;">bf(v)</th>
+  <th style="text-align:left; padding-right:18px;">bf(child)</th>
+  <th style="text-align:left;">Fix</th>
+</tr>
+<tr><td><b>LL</b></td><td>insert into <b>L</b>eft subtree of <b>L</b>eft child</td><td>&gt; 1</td><td>≥ 0</td><td><code>right_rotate(v)</code></td></tr>
+<tr><td><b>LR</b></td><td>insert into <b>R</b>ight subtree of <b>L</b>eft child</td><td>&gt; 1</td><td>&lt; 0</td><td><code>left_rotate(v-&gt;left)</code> then <code>right_rotate(v)</code></td></tr>
+<tr><td><b>RR</b></td><td>insert into <b>R</b>ight subtree of <b>R</b>ight child</td><td>&lt; −1</td><td>≤ 0</td><td><code>left_rotate(v)</code></td></tr>
+<tr><td><b>RL</b></td><td>insert into <b>L</b>eft subtree of <b>R</b>ight child</td><td>&lt; −1</td><td>&gt; 0</td><td><code>right_rotate(v-&gt;right)</code> then <code>left_rotate(v)</code></td></tr>
+</table>
+<br>
+<b>Mnemonic:</b>
+<ul>
+<li><b>LL</b> &amp; <b>RR</b> → ONE rotation (single).</li>
+<li><b>LR</b> &amp; <b>RL</b> → TWO rotations (double rotation).</li>
+<li>The first letter of the case tells you which side is too tall; the second letter tells you whether the child is also leaning the same way (single) or the opposite way (double).</li>
+</ul>
+</div>
+
+<div class="card">
+<div class="tag">Info2::AVL_Trees</div>
+<div class="question"><b>AVL</b> — What are the 5 steps for inserting an element in an AVL tree?</div>
+<ol>
+<li><b>Insert like in a normal BST</b> — find the right slot and attach the new node as a leaf.</li>
+<li><b>Move back up the recursion path</b> — every recursive call now returns to an ancestor of the inserted node.</li>
+<li><b>Update heights</b> — recompute the height of each ancestor:<br>
+<code>p-&gt;height = 1 + max(height(p-&gt;left), height(p-&gt;right));</code></li>
+<li><b>Compute the balance factor</b> — <code>bf = height(p-&gt;left) − height(p-&gt;right);</code></li>
+<li><b>Fix imbalances with rotations</b> — if <code>|bf| &gt; 1</code>, apply the matching rotation:<br>
+LL → right-rotate, RR → left-rotate, LR → left + right, RL → right + left.</li>
+</ol>
+<b>Important:</b> after an insertion, <b>at most ONE rotation (single or double)</b> is needed to fix the entire tree.
+</div>
+
+<div class="card">
+<div class="tag">Info2::AVL_Trees</div>
+<div class="question"><b>AVL</b> — There are 3 cases of deletion in an AVL tree. Name them. How does deletion differ from insertion regarding rebalancing?</div>
+The <b>3 deletion cases</b> are the same as for a plain BST:
+<ol>
+<li><b>Node is a leaf</b> → simply remove it.</li>
+<li><b>Node has exactly one child</b> → replace it with its child.</li>
+<li><b>Node has two children</b> → replace its <i>value</i> with the value of its inorder successor (the minimum of the right subtree), then delete that successor in the right subtree (which falls into case 1 or 2).</li>
+</ol>
+<b>Difference vs insertion regarding rebalancing:</b>
+<ul>
+<li><b>After insertion:</b> at most ONE rebalancing along the path back to the root is enough.</li>
+<li><b>After deletion:</b> up to <b>O(log n)</b> rebalancings — the height can shrink at the deleted spot, and that shrink can propagate upward all the way to the root, forcing many ancestors to be rebalanced.</li>
+</ul>
+That's why the AVL deletion algorithm <i>always</i> rebalances every ancestor on the way back up, not just the first imbalanced one.
+</div>
+
+<div class="card">
+<div class="tag">Info2::AVL_Trees</div>
+<div class="question"><b>AVL</b> — Code: one-liner to update the height of a node for rebalancing.</div>
+<pre><code>p-&gt;height = 1 + max(height(p-&gt;left), height(p-&gt;right));</code></pre>
+With the helper:
+<pre><code>int height(struct node *p) {
+    if (p == NULL) return -1;
+    return p-&gt;height;
+}</code></pre>
+<b>Why it works:</b> a leaf has <code>height(NULL) = −1</code> for both children, so its height becomes <code>1 + max(−1, −1) = 0</code>. Every internal node is 1 higher than its taller child.
+</div>
+
+<div class="card">
+<div class="tag">Info2::AVL_Trees</div>
+<div class="question"><b>AVL</b> — Write the full rebalancing pseudocode <code>AVLrebalance(p)</code>. It must first update the height of <code>p</code>, contain all 4 cases (<b>LL, RR, LR, RL</b>), and return <code>p</code> (or the new subtree root after rotation).</div>
+<pre><code>struct node *AVLrebalance(struct node *p) {
+    if (p == NULL) return NULL;
+
+    // 1) update height of p
+    p-&gt;height = 1 + max(height(p-&gt;left), height(p-&gt;right));
+
+    // 2) compute balance factor of p
+    int bf = height(p-&gt;left) - height(p-&gt;right);
+
+    // 3) LEFT side too heavy  (bf &gt; 1)
+    if (bf &gt; 1) {
+        // LR case: left child is right-heavy
+        // → first left-rotate the left child (turns LR into LL)
+        if (height(p-&gt;left-&gt;left) &lt; height(p-&gt;left-&gt;right)) {
+            p-&gt;left = left_rotate(p-&gt;left);
+        }
+        // LL case (or after LR conversion above): right-rotate p
+        return right_rotate(p);
+    }
+
+    // 4) RIGHT side too heavy (bf &lt; -1)
+    if (bf &lt; -1) {
+        // RL case: right child is left-heavy
+        // → first right-rotate the right child (turns RL into RR)
+        if (height(p-&gt;right-&gt;right) &lt; height(p-&gt;right-&gt;left)) {
+            p-&gt;right = right_rotate(p-&gt;right);
+        }
+        // RR case (or after RL conversion above): left-rotate p
+        return left_rotate(p);
+    }
+
+    // 5) already balanced → nothing to do
+    return p;
+}</code></pre>
+<b>Complexity:</b> <code>O(1)</code> per call (a constant number of pointer rewires + height updates).
+</div>
+
+<div class="card">
+<div class="tag">Info2::AVL_Trees</div>
+<div class="question"><b>AVL</b> — How do insertion and deletion work conceptually in an AVL tree? Give pseudocode for both.</div>
+<b>AVL Insertion — conceptual:</b>
+<ol>
+<li>Insert like in a normal BST.</li>
+<li>On the way back up the recursion, update heights and call <code>AVLrebalance</code> on every ancestor.</li>
+<li><i>At most ONE</i> rotation needed in total.</li>
+</ol>
+<pre><code>struct node *AVLInsert(struct node *root, int x) {
+    // 1) standard BST insertion (no duplicates)
+    if (root == NULL) {
+        struct node *p = malloc(sizeof(struct node));
+        p-&gt;value  = x;
+        p-&gt;height = 0;          // fresh leaf has height 0
+        p-&gt;left   = NULL;
+        p-&gt;right  = NULL;
+        return p;
+    }
+    if (x &lt; root-&gt;value) {
+        root-&gt;left  = AVLInsert(root-&gt;left,  x);
+    } else if (x &gt; root-&gt;value) {
+        root-&gt;right = AVLInsert(root-&gt;right, x);
+    } else {
+        return root;             // duplicate → ignore
+    }
+
+    // 2) rebalance on the way up
+    return AVLrebalance(root);
+}</code></pre>
+
+<b>AVL Deletion — conceptual:</b>
+<ol>
+<li>Delete like in a normal BST (the 3 cases).</li>
+<li>On the way back up, update heights and call <code>AVLrebalance</code> on every ancestor.</li>
+<li><i>Up to O(log n)</i> rotations possible because the shrink can propagate.</li>
+</ol>
+<pre><code>// deletes the node with value x from the AVL tree whose root is *p.
+// p is a pointer-to-pointer so we can OVERWRITE *p in place; the
+// recursion threads addresses through &amp;(*p)-&gt;left / &amp;(*p)-&gt;right.
+// usage at the top level:  AVLDelete(&amp;root, x);
+void AVLDelete(struct node **p, int x) {
+
+    // 1) base case: x is not in the tree → nothing to do
+    if (*p == NULL) return;
+
+    // 2) navigate / delete (no early return — we want to fall through
+    //    to the rebalance step at the bottom)
+    if (x &lt; (*p)-&gt;value) {
+        AVLDelete(&amp;(*p)-&gt;left, x);
+
+    } else if (x &gt; (*p)-&gt;value) {
+        AVLDelete(&amp;(*p)-&gt;right, x);
+
+    } else {
+        // found the node to delete
+
+        // case 1 + 2: at most one child
+        if ((*p)-&gt;left == NULL) {
+            struct node *q = *p;          // remember doomed node
+            *p = (*p)-&gt;right;             // parent slot → right child
+            free(q);
+        } else if ((*p)-&gt;right == NULL) {
+            struct node *q = *p;
+            *p = (*p)-&gt;left;              // parent slot → left child
+            free(q);
+        } else {
+            // case 3: two children — copy successor value, then delete it
+            struct node *tmp = bst_min((*p)-&gt;right);
+            (*p)-&gt;value = tmp-&gt;value;
+            AVLDelete(&amp;(*p)-&gt;right, tmp-&gt;value);
+        }
+    }
+
+    // 3) rebalance on the way up (only if there is still a node here).
+    //    AVLrebalance updates the height and applies LL/LR/RR/RL fixes.
+    if (*p != NULL) {
+        *p = AVLrebalance(*p);
+    }
+}</code></pre>
+<b>Total time complexity:</b> <code>O(log n)</code> for both — <code>O(1)</code> rebalance work per level × <code>O(log n)</code> levels.
+</div>
+
+<!-- ===================== HASH TABLES ===================== -->
+
+<div class="card">
+<div class="tag">Info2::Hash_Tables</div>
+<div class="question"><b>HT</b> — When do you use a hash table? When is it fastest? What is the time complexity of search, insert and delete?</div>
+<b>When to use:</b>
+<ul>
+<li>You need <b>fast lookup / insert / delete by key</b> and you do <b>not</b> need keys in sorted order.</li>
+<li>Typical uses: dictionaries, sets, caches, symbol tables, frequency counting.</li>
+</ul>
+<b>When is it fastest?</b>
+<ul>
+<li>When the hash function distributes keys <b>uniformly</b> (no clustering) and the <b>load factor α</b> is kept low (e.g. &lt; 0.7 for open addressing).</li>
+<li>Then all three core operations run in <b>expected O(1)</b>.</li>
+</ul>
+<b>Time complexity:</b>
+<table style="border-collapse: collapse;">
+<tr><th style="text-align:left; padding-right:18px;">Op</th><th style="text-align:left; padding-right:18px;">Average</th><th style="text-align:left;">Worst case</th></tr>
+<tr><td>search</td><td><b>O(1)</b></td><td><b>O(n)</b></td></tr>
+<tr><td>insert</td><td><b>O(1)</b></td><td><b>O(n)</b></td></tr>
+<tr><td>delete</td><td><b>O(1)</b></td><td><b>O(n)</b></td></tr>
+</table>
+<br>
+<b>Worst case</b> happens when all keys collide (every key hashes to the same slot / bucket) — then operations degrade to a linear scan.
+</div>
+
+<div class="card">
+<div class="tag">Info2::Hash_Tables</div>
+<div class="question"><b>HT</b> — Code: write the struct of a hash table in C. Add a comment that <code>int status</code> is either OCC, EMP, or DEL.</div>
+<pre><code>#define EMP 0   // empty — slot has never been used
+#define OCC 1   // occupied — slot holds a valid (key, value)
+#define DEL 2   // deleted — tombstone; search must keep probing past it
+
+struct slot {
+    int key;
+    int value;
+    int status;   // either OCC, EMP, or DEL
+};
+
+struct hash_table {
+    struct slot *table;   // dynamically allocated array of m slots
+    int m;                // size of the table (number of slots)
+};</code></pre>
+<b>Why we need 3 statuses (not just OCC / EMP):</b> with open addressing we cannot simply mark a deleted slot as EMP — that would break the probe sequence of other keys (see the deletion card). The <b>DEL</b> tombstone preserves the probe path while marking the slot as reusable for inserts.
+</div>
+
+<div class="card">
+<div class="tag">Info2::Hash_Tables</div>
+<div class="question"><b>HT</b> — Two methods of hashing: <b>division</b> and <b>multiplication</b>. State both formulas and give a good choice for <code>m</code> (division) and <code>A</code> (multiplication).</div>
+<b>1) Division method</b>
+<pre><code>h(k) = k mod m</code></pre>
+<ul>
+<li>Fast and easy.</li>
+<li><b>Good choice for m:</b> a <b>prime</b> that is <b>not close to a power of 2</b> (or a power of 10).</li>
+<li>Why? If <code>m = 2^p</code>, then <code>h(k)</code> = the last <code>p</code> bits of <code>k</code> → the high bits are ignored → terrible distribution.</li>
+</ul>
+<b>2) Multiplication method</b>
+<pre><code>h(k) = floor( m · ( k · A  mod  1 ) )</code></pre>
+where <code>0 &lt; A &lt; 1</code>. Take the fractional part of <code>k · A</code>, multiply by <code>m</code>, then floor.
+<ul>
+<li><b>Good choice for A:</b> Knuth's value <code>A ≈ (√5 − 1) / 2 ≈ 0.6180339887</code> (the golden-ratio conjugate).</li>
+<li><b>Value of m</b> is much less critical — often a power of 2 for speed.</li>
+</ul>
+</div>
+
+<div class="card">
+<div class="tag">Info2::Hash_Tables</div>
+<div class="question"><b>HT</b> — How do you initialize a hash table in C?</div>
+<pre><code>void init_HT(struct hash_table *H, int m) {
+    H-&gt;m = m;
+    H-&gt;table = malloc(m * sizeof(struct slot));
+
+    // every slot must start as EMP, otherwise insert/search/delete
+    // would read uninitialized garbage in the status field
+    for (int i = 0; i &lt; m; i++) {
+        H-&gt;table[i].status = EMP;
+    }
+}</code></pre>
+<b>Key point:</b> mark every slot as <code>EMP</code> at creation — the algorithms rely on EMP to know "this slot was never used".
+</div>
+
+<div class="card">
+<div class="tag">Info2::Hash_Tables</div>
+<div class="question"><b>HT — Chaining</b> — What is the load factor for chaining? What is the search complexity? What is the expected number of probes?</div>
+<b>Chaining:</b> each slot holds a linked list ("chain") of all keys that hash to that slot.
+<br><br>
+<b>Load factor:</b>
+<pre><code>α = n / m</code></pre>
+where <code>n</code> = number of stored keys and <code>m</code> = number of buckets. For chaining <b>α can exceed 1</b> (chains can be arbitrarily long).
+<br><br>
+<b>Search complexity:</b>
+<ul>
+<li><b>Average:</b> <code>O(1 + α)</code> — constant hashing time plus a walk through one chain of expected length α.</li>
+<li><b>Worst case:</b> <code>O(n)</code> — if all keys hash to the same bucket, one chain holds everything.</li>
+</ul>
+<b>Expected number of probes:</b>
+<ul>
+<li><b>Unsuccessful search:</b> <code>≈ α</code> (must walk the full chain).</li>
+<li><b>Successful search:</b> <code>≈ 1 + α / 2</code> (on average we find the key in the middle of the chain).</li>
+</ul>
+</div>
+
+<div class="card">
+<div class="tag">Info2::Hash_Tables</div>
+<div class="question"><b>HT — Open addressing</b> — How does it work (principle)? What is the load factor?</div>
+<b>Principle:</b>
+<ul>
+<li><b>All elements are stored directly in the table array</b> — no linked lists, no chains.</li>
+<li>On a collision, we <b>probe</b> for the next slot using a probe sequence: <code>h(k, 0), h(k, 1), h(k, 2), …</code></li>
+<li><b>Insert:</b> probe until we find an EMP or DEL slot.</li>
+<li><b>Search:</b> probe until we find the key (OCC + same key) or hit an EMP slot (then key is not in the table).</li>
+<li><b>Delete:</b> mark the slot as DEL (tombstone), <i>not</i> EMP — otherwise we would break the probe path of other keys.</li>
+</ul>
+<b>Load factor:</b>
+<pre><code>α = n / m,    with    α ≤ 1</code></pre>
+<b>α cannot exceed 1</b> because every slot holds at most one element. In practice keep <code>α ≤ 0.7</code> for good performance; if it grows beyond that, resize the table.
+</div>
+
+<div class="card">
+<div class="tag">Info2::Hash_Tables</div>
+<div class="question"><b>HT</b> — What is the formula for <b>linear probing</b>?</div>
+<pre><code>h(k, i) = ( h'(k) + i )  mod  m</code></pre>
+where:
+<ul>
+<li><code>h'(k)</code> is any base hash function (e.g. <code>k mod m</code>).</li>
+<li><code>i = 0, 1, 2, …, m − 1</code> is the probe number.</li>
+</ul>
+So we simply check slot <code>h'(k)</code>, then <code>h'(k) + 1</code>, then <code>h'(k) + 2</code>, … (wrapping mod m).
+<br><br>
+<b>Drawback:</b> <b>primary clustering</b> — long runs of occupied slots accumulate and slow down every probe that lands inside them.
+</div>
+
+<div class="card">
+<div class="tag">Info2::Hash_Tables</div>
+<div class="question"><b>HT</b> — What is the formula for <b>quadratic probing</b>?</div>
+<pre><code>h(k, i) = ( h'(k) + c₁ · i + c₂ · i² )  mod  m</code></pre>
+where <code>c₁</code> and <code>c₂ ≠ 0</code> are constants and <code>i = 0, 1, 2, …, m − 1</code>.
+<br><br>
+The probe jumps grow quadratically, which <b>breaks up primary clustering</b>.
+<br><br>
+<b>Drawback:</b> <b>secondary clustering</b> — any two keys with the same <code>h'(k)</code> follow the exact same probe sequence. Also <code>c₁, c₂, m</code> must be chosen carefully so the probe sequence visits every slot.
+</div>
+
+<div class="card">
+<div class="tag">Info2::Hash_Tables</div>
+<div class="question"><b>HT</b> — What is the formula for <b>double hashing</b>? What is a good choice for <code>m'</code>?</div>
+<pre><code>h(k, i) = ( h₁(k) + i · h₂(k) )  mod  m</code></pre>
+where <code>h₁</code> is the primary hash function and <code>h₂</code> is a <b>second</b> hash function used as the step size.
+<br><br>
+<b>Requirements on h₂:</b>
+<ul>
+<li><code>h₂(k) ≠ 0</code> for all keys.</li>
+<li><code>h₂(k)</code> must be <b>relatively prime to m</b>, otherwise the probe sequence will not visit every slot.</li>
+</ul>
+<b>Typical choice:</b>
+<pre><code>h₂(k) = 1 + ( k mod m' )</code></pre>
+where <code>m'</code> is slightly smaller than <code>m</code>, e.g. <code>m' = m − 1</code> or <code>m' = m − 2</code>, chosen <b>prime</b>. This guarantees the "coprime with m" requirement.
+<br><br>
+<b>Why double hashing is the best of the three:</b> different keys with the same <code>h₁(k)</code> get <i>different</i> probe sequences (because their <code>h₂(k)</code> differs) → almost no clustering.
+</div>
+
+<div class="card">
+<div class="tag">Info2::Hash_Tables</div>
+<div class="question"><b>HT</b> — Deletion in a hash table: why can we NOT just set a slot to EMP? Code deletion in C.</div>
+<b>Why not just set it to EMP?</b>
+<br><br>
+Because that would break <i>search</i> for other keys that probed past this slot during insertion. Example with linear probing:
+<ol>
+<li>Insert <code>k₁</code> → lands at slot 3.</li>
+<li>Insert <code>k₂</code> with <code>h(k₂) = 3</code> → slot 3 is taken → linear probe → lands at slot 4.</li>
+<li>Now delete <code>k₁</code> and set slot 3 to <code>EMP</code>.</li>
+<li>Search for <code>k₂</code>: hash to slot 3, see <code>EMP</code>, return "not found".<br>
+But <code>k₂</code> is sitting at slot 4! Bug.</li>
+</ol>
+<b>Solution:</b> use a <b>DEL tombstone</b>. Search treats DEL like OCC (keep probing). Insert treats DEL like EMP (slot can be reused).
+<br><br>
+<b>C code (with linear probing):</b>
+<pre><code>// marks the slot of key k as DELETED (tombstone).
+// returns the slot index on success, -1 if k is not in the table.
+int hash_delete(struct hash_table *H, int k) {
+    for (int i = 0; i &lt; H-&gt;m; i++) {
+        int idx = (h(k) + i) % H-&gt;m;
+
+        // EMP slot → k cannot be further along the probe path
+        if (H-&gt;table[idx].status == EMP) return -1;
+
+        // OCC and key matches → tombstone it
+        if (H-&gt;table[idx].status == OCC &amp;&amp; H-&gt;table[idx].key == k) {
+            H-&gt;table[idx].status = DEL;
+            return idx;
+        }
+
+        // DEL slot → skip, keep probing
+    }
+    return -1;   // searched the whole table, key not found
+}</code></pre>
+</div>
+
+<div class="card">
+<div class="tag">Info2::Hash_Tables</div>
+<div class="question"><b>HT</b> — Code: insert a key in a hash table with <b>linear probing</b>.</div>
+<pre><code>// inserts (k, v) into the hash table H.
+// returns the slot index on success, -1 if the table is full.
+int hash_insert(struct hash_table *H, int k, int v) {
+    // i = probe number;   idx = slot to check at this probe
+    for (int i = 0; i &lt; H-&gt;m; i++) {
+        int idx = (h(k) + i) % H-&gt;m;
+
+        // we can reuse EMP slots AND DEL tombstones
+        if (H-&gt;table[idx].status != OCC) {
+            H-&gt;table[idx].key    = k;
+            H-&gt;table[idx].value  = v;
+            H-&gt;table[idx].status = OCC;
+            return idx;
+        }
+
+        // OCC slot → collision, advance the probe
+    }
+    return -1;   // table is full
+}</code></pre>
+<b>Note:</b> this assumes <code>k</code> is not already in the table. If duplicates must be rejected, first run <code>hash_search(H, k)</code> and only insert if the search returns -1.
+</div>
+
+<div class="card">
+<div class="tag">Info2::Hash_Tables</div>
+<div class="question"><b>HT</b> — Code: search for a key <code>k</code> in a hash table with <b>linear probing</b>.</div>
+<pre><code>// searches for key k in the hash table H.
+// returns the slot index if found, -1 otherwise.
+int hash_search(struct hash_table *H, int k) {
+    for (int i = 0; i &lt; H-&gt;m; i++) {
+        int idx = (h(k) + i) % H-&gt;m;
+
+        // EMP means: slot was never used. linear probing would have
+        // placed k HERE if it had ever been inserted → it isn't in
+        // the table → stop searching.
+        if (H-&gt;table[idx].status == EMP) return -1;
+
+        // OCC and key matches → found
+        if (H-&gt;table[idx].status == OCC &amp;&amp; H-&gt;table[idx].key == k) {
+            return idx;
+        }
+
+        // DEL → skip and continue probing (don't stop here!)
+    }
+    return -1;   // searched the whole table, key not found
+}</code></pre>
+<b>Key detail:</b> stop on EMP but <i>never</i> on DEL — that is exactly why we need the DEL tombstone.
 </div>
 
 </body>
