@@ -1,0 +1,1844 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Flashcards Preview — Info2</title>
+<style>
+  body {
+    font-family: -apple-system, "Segoe UI", Arial, sans-serif;
+    background: #f4f4f7;
+    color: #222;
+    max-width: 820px;
+    margin: 24px auto;
+    padding: 0 16px 60px;
+    line-height: 1.5;
+  }
+  h1 { text-align: center; }
+  .hint { text-align: center; color: #666; margin-bottom: 28px; font-size: 0.9em;}
+  .card {
+    background: white;
+    border: 1px solid #d0d0d8;
+    border-radius: 10px;
+    margin: 18px 0;
+    padding: 18px 22px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+  }
+  .question {
+    font-size: 1.05em;
+    border-bottom: 1px dashed #ccc;
+    padding-bottom: 10px;
+    margin-bottom: 12px;
+  }
+  .tag {
+    display: inline-block;
+    background: #eaeaf5;
+    color: #444;
+    font-size: 0.75em;
+    padding: 2px 8px;
+    border-radius: 10px;
+    margin-bottom: 8px;
+  }
+  pre {
+    background: #1e1e2e;
+    color: #e6e6e6;
+    padding: 12px 14px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 0.88em;
+    line-height: 1.4;
+  }
+  code { font-family: "JetBrains Mono", Consolas, monospace; }
+  pre code .cm { color: #8a8aa0; font-style: italic; }
+  ol, ul { padding-left: 22px; }
+  li { margin: 3px 0; }
+  b { color: #1a1a2e; }
+</style>
+</head>
+<body>
+
+<h1>Info2 Flashcards — Preview</h1>
+<p class="hint">This file shows exactly how each card will look in Anki. Open it in any browser (double-click the file). Refresh after every change.</p>
+
+<!-- ===================== SORTING ===================== -->
+
+<div class="card">
+<div class="tag">Info2::Sorting</div>
+<div class="question"><b>Bubble Sort</b> — Explain how it works (steps, ~4 bullets), code it in C, and state time &amp; space complexity (best / avg / worst, space).</div>
+<b>Principle (steps):</b>
+<ol>
+<li>Walk through the array from left to right.</li>
+<li>For every adjacent pair, if the left element is greater than the right, swap them.</li>
+<li>After one full pass, the largest unsorted element has 'bubbled up' to the end → it is now in its final position.</li>
+<li>Repeat for the remaining unsorted prefix. After <i>i</i> passes the last <i>i</i> elements are sorted.</li>
+</ol>
+<b>C code:</b>
+<pre><code>void bubble_sort(int a[], int n) {
+    // i counts how many passes we have done
+    // after pass i the last i elements are already in place
+    for (int i = 0; i &lt; n - 1; i++) {
+        // j stops at n-1-i because the last i elements are already sorted
+        for (int j = 0; j &lt; n - 1 - i; j++) {
+            if (a[j] &gt; a[j+1]) {
+                int tmp = a[j];
+                a[j]    = a[j+1];
+                a[j+1]  = tmp;
+            }
+        }
+    }
+}</code></pre>
+<b>Complexity:</b>
+<ul>
+<li>Time — Best / Average / Worst: <b>O(n²)</b>.</li>
+<li>Space: <b>O(1)</b>, in-place.</li>
+</ul>
+</div>
+
+<div class="card">
+<div class="tag">Info2::Sorting</div>
+<div class="question"><b>Selection Sort</b> — Explain how it works (steps, ~4 bullets), code it in C, and state time &amp; space complexity (best / avg / worst, space).</div>
+<b>Principle (steps):</b>
+<ol>
+<li>Split the array conceptually into a sorted prefix (initially empty) and an unsorted suffix.</li>
+<li>Scan the unsorted suffix to find the minimum element.</li>
+<li>Swap that minimum with the first element of the unsorted suffix → the sorted prefix grows by one.</li>
+<li>Repeat until the unsorted suffix is empty. Exactly <i>n − 1</i> swaps in total.</li>
+</ol>
+<b>C code:</b>
+<pre><code>void selection_sort(int a[], int n) {
+    // i = boundary; the sorted prefix is a[0..i-1]
+    for (int i = 0; i &lt; n - 1; i++) {
+        // min_idx = index of the smallest element found so far in the unsorted part
+        int min_idx = i;
+        // scan the unsorted suffix [i+1, n)
+        for (int j = i + 1; j &lt; n; j++) {
+            if (a[j] &lt; a[min_idx]) {
+                min_idx = j;
+            }
+        }
+        // put the minimum at position i (skip swap if it's already there)
+        if (min_idx != i) {
+            int tmp     = a[i];
+            a[i]        = a[min_idx];
+            a[min_idx]  = tmp;
+        }
+    }
+}</code></pre>
+<b>Complexity:</b>
+<ul>
+<li>Time — Best / Average / Worst: <b>O(n²)</b> (always scans the full suffix, no early exit).</li>
+<li>Space: <b>O(1)</b>, in-place.</li>
+<li>Nice property: only <b>O(n)</b> swaps total → good when writes are expensive.</li>
+</ul>
+</div>
+
+<div class="card">
+<div class="tag">Info2::Sorting</div>
+<div class="question"><b>Insertion Sort</b> — Explain how it works (steps, ~5 bullets), code it in C, and state time &amp; space complexity (best / avg / worst, space).</div>
+<b>Principle (steps):</b>
+<ol>
+<li>Treat the first element as a sorted sub-array of length 1.</li>
+<li>Take the next element (the <i>key</i>) from the unsorted part.</li>
+<li>Shift every element of the sorted part that is greater than the key one position to the right.</li>
+<li>Insert the key into the gap so the sorted part is sorted again.</li>
+<li>Repeat for every remaining element. Sorted region grows by 1 each iteration.</li>
+</ol>
+<b>C code:</b>
+<pre><code>void insertion_sort(int a[], int n) {
+    // i = first index of the unsorted part; sorted part is a[0..i-1]
+    for (int i = 1; i &lt; n; i++) {
+        // key = element we are inserting into the sorted prefix
+        int key = a[i];
+        // j walks left through the sorted prefix
+        int j   = i - 1;
+        // shift every element greater than key one position to the right
+        while (j &gt;= 0 &amp;&amp; a[j] &gt; key) {
+            a[j+1] = a[j];
+            j--;
+        }
+        // j+1 is the correct slot for key (the gap left by the shifting)
+        a[j+1] = key;
+    }
+}</code></pre>
+<b>Complexity:</b>
+<ul>
+<li>Time — Best: <b>O(n)</b> (already sorted, inner while exits immediately). Average / Worst: <b>O(n²)</b>.</li>
+<li>Space: <b>O(1)</b>, in-place.</li>
+<li>Excellent for <b>small</b> or <b>nearly-sorted</b> arrays.</li>
+</ul>
+</div>
+
+<div class="card">
+<div class="tag">Info2::Sorting</div>
+<div class="question"><b>Quick Sort</b> — Explain how it works (steps, ~4 bullets), code it in C (Hoare partition), and state time &amp; space complexity (best / avg / worst, space).</div>
+<b>Principle (steps):</b>
+<ol>
+<li>Base case: a sub-array of length ≤ 1 is sorted → return.</li>
+<li>Pick a <i>pivot</i> (we use <code>a[lo]</code> here; see the pivot-choice card for better options).</li>
+<li><b>Partition (Hoare):</b> two pointers walk towards each other from both ends, swapping out-of-place elements, until they cross. Result: every element left of the split is ≤ pivot, every element right of the split is ≥ pivot.</li>
+<li>Recursively quicksort both halves. With Hoare you recurse on <code>[lo, p]</code> and <code>[p+1, hi]</code> (note: <code>p</code>, not <code>p−1</code>, because the pivot is not guaranteed to land at index <code>p</code>).</li>
+</ol>
+<b>C code (Hoare partition):</b>
+<pre><code>static void swap(int *x, int *y) {
+    int tmp = *x; *x = *y; *y = tmp;
+}
+
+// Hoare partition: returns an index p such that
+//   every element in a[lo..p]   is &lt;= pivot,
+//   every element in a[p+1..hi] is &gt;= pivot.
+// (The pivot itself can end up anywhere on the left side.)
+int hoare_partition(int a[], int lo, int hi) {
+    // pivot value (any choice works; we take the first element)
+    int pivot = a[lo];
+    // i = left pointer, starts just OUTSIDE the range; will move right
+    int i = lo - 1;
+    // j = right pointer, starts just OUTSIDE the range; will move left
+    int j = hi + 1;
+    while (1) {
+        // advance i until we find an element NOT smaller than pivot
+        do { i++; } while (a[i] &lt; pivot);
+        // advance j until we find an element NOT greater than pivot
+        do { j--; } while (a[j] &gt; pivot);
+        // if the pointers crossed, the partition is complete
+        if (i &gt;= j) return j;
+        // otherwise a[i] and a[j] are on the wrong sides → swap them
+        swap(&amp;a[i], &amp;a[j]);
+    }
+}
+
+void quick_sort(int a[], int lo, int hi) {
+    if (lo &lt; hi) {
+        int p = hoare_partition(a, lo, hi);
+        // with Hoare we use p (NOT p-1) for the left recursive call
+        quick_sort(a, lo, p);
+        quick_sort(a, p + 1, hi);
+    }
+}</code></pre>
+<b>Complexity:</b>
+<ul>
+<li>Time — Best / Average: <b>O(n log n)</b>. Worst: <b>O(n²)</b> (bad pivot every time, e.g. always picking the smallest / largest element).</li>
+<li>Space: <b>O(log n)</b> recursion stack on average, <b>O(n)</b> in the worst case. In-place (no extra array).</li>
+<li>In practice the fastest comparison sort due to good cache behavior and small constants.</li>
+</ul>
+</div>
+
+<div class="card">
+<div class="tag">Info2::Sorting</div>
+<div class="question"><b>Quick Sort</b> — What is the best choice for a good pivot, and why? (3 practical choices + why pivot choice matters)</div>
+<b>Ideal pivot:</b> the <i>median</i> of the sub-array → both partitions have size ≈ n/2 → recursion depth ≈ log n → total <b>O(n log n)</b>.
+But finding the true median costs an extra O(n) per call → too expensive in practice.
+
+<p><b>Three practical pivot strategies:</b></p>
+<ol>
+<li><b>Random pivot</b> — pick a uniformly random index in <code>[lo, hi]</code>. Defeats adversarial inputs (sorted / reverse-sorted arrays). Expected <b>O(n log n)</b>, worst case still possible but extremely unlikely.</li>
+<li><b>Median-of-three</b> — take the median of <code>a[lo]</code>, <code>a[mid]</code>, <code>a[hi]</code>. Cheap (3 comparisons), usually much closer to the true median than any single element. This is what most real-world implementations use.</li>
+<li><b>Middle element</b> <code>a[(lo+hi)/2]</code> — simple; avoids the O(n²) worst case on already-sorted input (the classic trap when using the first or last element).</li>
+</ol>
+<b>Why does pivot choice matter so much?</b>
+<ul>
+<li>A pivot near the median splits the array roughly in half → recursion depth ≈ <b>log n</b> → <b>O(n log n)</b> total work.</li>
+<li>A pivot at the extreme (always min or max) splits into sizes 0 and n−1 → recursion depth ≈ <b>n</b> → <b>O(n²)</b> total.</li>
+<li>So the pivot choice is exactly what separates the <i>average</i> case from the <i>worst</i> case in quicksort.</li>
+</ul>
+</div>
+
+<div class="card">
+<div class="tag">Info2::Sorting</div>
+<div class="question"><b>Heap Sort</b> — Explain what a <i>heap</i> is, how heap sort works (steps, ~5 bullets), code <code>heapify</code> and <code>heap_sort</code> in C, and state time &amp; space complexity (best / avg / worst, space).</div>
+<b>What is a heap?</b><br>
+A <b>heap</b> is a <i>complete binary tree</i> (filled level-by-level, left-to-right) stored implicitly in an array. In a <b>max-heap</b>, every parent ≥ both its children (min-heap: parent ≤ children). For an element at index <code>i</code> (0-indexed):
+<ul>
+<li>Parent: <code>(i − 1) / 2</code></li>
+<li>Left child: <code>2·i + 1</code></li>
+<li>Right child: <code>2·i + 2</code></li>
+</ul>
+<b>Heap sort — steps:</b>
+<ol>
+<li><b>Build max-heap:</b> call <code>heapify</code> on every non-leaf node from index <code>n/2 − 1</code> down to <code>0</code>. Costs O(n).</li>
+<li>The maximum element is now at index 0 (the root).</li>
+<li>Swap <code>a[0]</code> with <code>a[i]</code> (the last element of the active heap) → max is placed in its final position.</li>
+<li>Shrink the heap by 1 and call <code>heapify(a, i, 0)</code> to restore the max-heap property.</li>
+<li>Repeat until the heap has 1 element. The array is now sorted ascending.</li>
+</ol>
+<b>C code:</b>
+<pre><code>// Restore the max-heap property at node i,
+// assuming the subtrees rooted at 2i+1 and 2i+2 are already valid heaps.
+// n = size of the currently active heap.
+void heapify(int a[], int n, int i) {
+    // largest = index of the largest of {i, left child, right child}
+    int largest = i;
+    int l = 2*i + 1;   // left child
+    int r = 2*i + 2;   // right child
+    // compare with left child (only if it exists, i.e. l &lt; n)
+    if (l &lt; n &amp;&amp; a[l] &gt; a[largest]) largest = l;
+    // compare with right child (only if it exists)
+    if (r &lt; n &amp;&amp; a[r] &gt; a[largest]) largest = r;
+    // if a child was larger, swap and recurse down into that child
+    if (largest != i) {
+        int tmp = a[i]; a[i] = a[largest]; a[largest] = tmp;
+        heapify(a, n, largest);
+    }
+}
+
+void heap_sort(int a[], int n) {
+    // ----- BUILD MAX-HEAP -----
+    // Leaves (indices n/2 .. n-1) are trivially valid heaps on their own,
+    // so we only need to heapify INTERNAL nodes.
+    // We go bottom-up (last internal node → root) so that when heapify runs,
+    // the children of i are already valid heaps. This is what makes
+    // build-heap cost O(n) instead of O(n log n).
+    for (int i = n/2 - 1; i &gt;= 0; i--) {
+        heapify(a, n, i);
+    }
+    // ----- SORT -----
+    // Repeatedly move the current max (root) to the end,
+    // then restore the heap on the shrunken range [0, i).
+    for (int i = n - 1; i &gt; 0; i--) {
+        // move max (root) to position i (its final spot)
+        int tmp = a[0]; a[0] = a[i]; a[i] = tmp;
+        // active heap is now of size i; restore property at root
+        heapify(a, i, 0);
+    }
+}</code></pre>
+<b>Complexity:</b>
+<ul>
+<li>Time — Best / Average / Worst: <b>O(n log n)</b>. Build-heap is O(n), then n − 1 extractions cost O(log n) each.</li>
+<li>Space: <b>O(1)</b> in-place (iterative <code>heapify</code>) or O(log n) recursion stack as written above.</li>
+</ul>
+</div>
+
+<div class="card">
+<div class="tag">Info2::Sorting</div>
+<div class="question"><b>Merge Sort</b> — Explain the <i>divide-and-conquer</i> principle (3 phases) and how merge sort applies it (steps, ~4 bullets), code it in C, and state time &amp; space complexity (best / avg / worst, space).</div>
+<b>Divide &amp; Conquer (3 phases):</b>
+<ol>
+<li><b>Divide</b> the problem into smaller sub-problems of the same type.</li>
+<li><b>Conquer</b> each sub-problem recursively (base case: trivial size).</li>
+<li><b>Combine</b> the sub-solutions into a solution of the original problem.</li>
+</ol>
+<b>Merge sort — steps:</b>
+<ol>
+<li>Base case: a sub-array of length ≤ 1 is already sorted → return.</li>
+<li><b>Divide:</b> split the array at the middle index into two halves.</li>
+<li><b>Conquer:</b> recursively merge-sort both halves.</li>
+<li><b>Combine (merge):</b> walk two pointers through the two sorted halves and write the smaller current element into the output → produces one sorted array.</li>
+</ol>
+<b>C code:</b>
+<pre><code>// Merge two already-sorted halves a[lo..mid] and a[mid+1..hi]
+// into one sorted run stored back in a[lo..hi].
+void merge(int a[], int lo, int mid, int hi) {
+    // n1 = size of left half, n2 = size of right half
+    int n1 = mid - lo + 1;
+    int n2 = hi - mid;
+
+    // create two temporary arrays and copy the two halves into them
+    // (we need copies because we will overwrite a[lo..hi] while merging)
+    int L[n1], R[n2];
+    for (int i = 0; i &lt; n1; i++) L[i] = a[lo + i];
+    for (int j = 0; j &lt; n2; j++) R[j] = a[mid + 1 + j];
+
+    // i = read cursor in L, j = read cursor in R, k = write cursor in a
+    int i = 0, j = 0, k = lo;
+
+    // walk through BOTH halves at the same time
+    while (i &lt; n1 &amp;&amp; j &lt; n2) {
+        // pick whichever current element is smaller and copy it to a[k]
+        if (L[i] &lt;= R[j]) a[k++] = L[i++];
+        else              a[k++] = R[j++];
+    }
+    // at this point ONE of the two halves is fully consumed;
+    // copy the leftover elements of the OTHER half (they are already sorted)
+    while (i &lt; n1) a[k++] = L[i++];
+    while (j &lt; n2) a[k++] = R[j++];
+}
+
+void merge_sort(int a[], int lo, int hi) {
+    // base case: 0 or 1 elements → already sorted, nothing to do
+    if (lo &lt; hi) {
+        // DIVIDE: compute midpoint
+        // (the form lo + (hi-lo)/2 avoids integer overflow vs. (lo+hi)/2)
+        int mid = lo + (hi - lo) / 2;
+
+        // CONQUER: recursively sort each half
+        merge_sort(a, lo, mid);        // left half:  a[lo..mid]
+        merge_sort(a, mid + 1, hi);    // right half: a[mid+1..hi]
+
+        // COMBINE: merge the two sorted halves back together
+        merge(a, lo, mid, hi);
+    }
+}</code></pre>
+<b>Complexity:</b>
+<ul>
+<li>Time — Best / Average / Worst: <b>O(n log n)</b> (recurrence T(n) = 2·T(n/2) + Θ(n)).</li>
+<li>Space: <b>O(n)</b> extra for the merge buffers + O(log n) recursion stack. <b>Not</b> in-place.</li>
+</ul>
+</div>
+
+<div class="card">
+<div class="tag">Info2::Sorting</div>
+<div class="question"><b>Dual-Pivot Quicksort</b> — In a dual-pivot quicksort implementation, an array <code>A[low...high]</code> is sorted based on two pivots <code>p1 = A[low]</code> and <code>p2 = A[high]</code>. The pivot <code>p1</code> must be less than <code>p2</code>, otherwise they have to be swapped. Here <code>low</code> is the left end of the array <code>A</code> and <code>high</code> is the right end of the array <code>A</code>.<br><br>
+The partitioning process is the core of the dual-pivot quicksort. We begin partitioning the array into three proper partitions I, II and III, where:
+<ul>
+<li>Partition I: all elements are less than the left pivot <code>p1</code>.</li>
+<li>Partition II: all elements are greater or equal to <code>p1</code> and less than the right pivot <code>p2</code>.</li>
+<li>Partition III: all elements are greater than or equal to the right pivot <code>p2</code>.</li>
+</ul>
+After partitioning, the two pivots are placed in their proper final positions and the process is repeated recursively on each of the three partitions.<br><br>
+Create a C program that implements dual-pivot quicksort to sort an array <code>A</code> of integers in increasing order. Your program should also print the array before and after sorting. For example, if the array is <code>[10, 7, 3, 15, 6, 2, 5, 1, 17, 8]</code>, the output should contain:
+<pre><code>Before: [ 10 7 3 15 6 2 5 1 17 8 ]
+After:  [ 1 2 3 5 6 7 8 10 15 17 ]</code></pre></div>
+<b>Quick explanation in words:</b>
+<ul>
+<li>Choose two pivots: the leftmost and the rightmost element.</li>
+<li>If they are in the wrong order, swap them so <code>p1 &lt;= p2</code>.</li>
+<li>Then scan the array once and split it into three regions: smaller than <code>p1</code>, between the pivots, and greater or equal to <code>p2</code>.</li>
+<li>Finally, put both pivots into their final places and recursively sort the three remaining parts.</li>
+</ul>
+<b>C code:</b>
+<pre><code>#include &lt;stdio.h&gt;
+
+#define ARRAY_SIZE 10
+
+void swap(int A[], int i, int j) {
+    // swap the two elements at indices i and j
+    int tmp = A[i];
+    A[i] = A[j];
+    A[j] = tmp;
+}
+
+void printArray(int a[], int size) {
+    // print the array in the required format: [ 1 2 3 ]
+    printf("[");
+    for (int i = 0; i &lt; size; i++) {
+        printf(" %d", a[i]);
+    }
+    printf(" ]\\n");
+}
+
+void partitioning(int A[], int low, int high, int *p1, int *p2) {
+    // A[low] is the left pivot, A[high] is the right pivot
+    // l = first free position in partition I  (< p1)
+    // k = current scanning index
+    // g = first position of partition III (>= p2) from the right
+    int l = low + 1;
+    int k = low + 1;
+    int g = high;
+
+    // scan the array once and move each element into its correct partition
+    while (k &lt; g) {
+        // belongs to partition I: move it to the left side
+        if (A[k] &lt; A[low]) {
+            swap(A, l, k);
+            l++;
+            k++;
+        }
+        // belongs to partition III: move it to the right side
+        else if (A[k] &gt;= A[high]) {
+            g--;
+            swap(A, k, g);
+            // do NOT increment k here:
+            // the element swapped in from the right has not been inspected yet
+        }
+        // otherwise it belongs to partition II and stays in the middle
+        else {
+            k++;
+        }
+
+        // prints intermediate partitioning steps
+        printArray(A, ARRAY_SIZE);
+    }
+
+    // place the pivots into their final positions
+    swap(A, low, l - 1);
+    swap(A, high, k);
+
+    // return the pivot positions through pointers
+    *p1 = l - 1;
+    *p2 = k;
+}
+
+void quicksort(int A[], int low, int high) {
+    // base case: empty part or single element => already sorted
+    if (high - low &lt;= 0) {
+        return;
+    }
+
+    // ensure the left pivot is not larger than the right pivot
+    if (A[low] &gt; A[high]) {
+        swap(A, low, high);
+    }
+
+    int p1, p2;
+
+    // partition the current subarray around the two pivots
+    partitioning(A, low, high, &p1, &p2);
+
+    // recursively sort the three partitions
+    quicksort(A, low, p1 - 1);
+    quicksort(A, p1 + 1, p2 - 1);
+    quicksort(A, p2 + 1, high);
+}
+
+int main() {
+    int A[] = {10, 7, 3, 15, 6, 2, 5, 1, 17, 8};
+    int n = 10;
+
+    printf("Before: ");
+    printArray(A, n);
+
+    quicksort(A, 0, n - 1);
+
+    printf("After:  ");
+    printArray(A, n);
+
+    return 0;
+}</code></pre>
+</div>
+
+<!-- ===================== COMPLEXITY AND CORRECTNESS ===================== -->
+
+<div class="card">
+<div class="tag">Info2::Complexity_and_Correctness</div>
+<div class="question"><b>Time complexity</b> — Rank the 8 most common time complexity classes from smallest (fastest) to largest (slowest).</div>
+<b>Ranking (smallest → largest):</b>
+<pre><code>O(1) &lt; O(log n) &lt; O(n) &lt; O(n log n) &lt; O(n²) &lt; O(n³) &lt; O(2ⁿ) &lt; O(n!)</code></pre>
+<b>What each one is:</b>
+<ul>
+<li><b>O(1)</b> — constant: same time regardless of n (array access, hash lookup).</li>
+<li><b>O(log n)</b> — logarithmic: each step halves the problem (binary search).</li>
+<li><b>O(n)</b> — linear: one pass through the input.</li>
+<li><b>O(n log n)</b> — linearithmic: good comparison sorts (merge / heap / quick sort).</li>
+<li><b>O(n²)</b> — quadratic: two nested loops (bubble / selection / insertion sort).</li>
+<li><b>O(n³)</b> — cubic: e.g. naive matrix multiplication, Floyd–Warshall.</li>
+<li><b>O(2ⁿ)</b> — exponential: subsets, naive recursive Fibonacci, brute-force SAT.</li>
+<li><b>O(n!)</b> — factorial: all permutations, brute-force TSP.</li>
+</ul>
+<b>Rule of thumb:</b> any polynomial n^k grows slower than any exponential cⁿ, which grows slower than n!
+</div>
+
+<div class="card">
+<div class="tag">Info2::Complexity_and_Correctness</div>
+<div class="question"><b>Time complexity</b> — What does <i>log n</i> mean in words when analyzing an algorithm? Why does it appear?</div>
+<b>In words:</b><br>
+<code>log n</code> = the number of times you can <b>halve</b> n (or divide it by any constant factor &gt; 1) before reaching 1.
+<ul>
+<li>log₂ 1 024 = 10</li>
+<li>log₂ 1 000 000 ≈ 20</li>
+<li>log₂ 1 000 000 000 ≈ 30</li>
+</ul>
+Extremely slow growth!
+<br>
+<b>When it appears:</b><br>
+An algorithm's complexity contains a <code>log n</code> factor whenever each step shrinks the problem to a <b>constant fraction</b> of its previous size — e.g. binary search halves the search range, balanced BST operations cut the depth in half, mergesort recurses on halves.
+<br><br>
+<b>Why no base?</b><br>
+Changing the base of a log only multiplies by a constant (log₂ n = log₁₀ n / log₁₀ 2). Constants are dropped in O-notation → <code>O(log n)</code> is base-independent.
+</div>
+
+<div class="card">
+<div class="tag">Info2::Complexity_and_Correctness</div>
+<div class="question"><b>Time complexity</b> — What is the complexity of this code?
+<pre><code>int first = a[0];
+int last  = a[n - 1];
+return first + last;</code></pre></div>
+<b>O(1)</b> — constant.<br><br>
+A fixed number of array accesses and one addition. No loop or recursion that depends on n → the work is independent of input size.
+</div>
+
+<div class="card">
+<div class="tag">Info2::Complexity_and_Correctness</div>
+<div class="question"><b>Time complexity</b> — What is the complexity of this code?
+<pre><code>int count = 0;
+for (int i = n; i &gt; 1; i = i / 2) {
+    count++;
+}</code></pre></div>
+<b>O(log n)</b> — logarithmic.<br><br>
+i is <b>halved</b> each iteration. The number of iterations until i drops from n down to 1 is log₂ n.
+</div>
+
+<div class="card">
+<div class="tag">Info2::Complexity_and_Correctness</div>
+<div class="question"><b>Time complexity</b> — What is the complexity of this code?
+<pre><code>int sum = 0;
+for (int i = 0; i &lt; n; i++) {
+    sum += a[i];
+}</code></pre></div>
+<b>O(n)</b> — linear.<br><br>
+A single pass through the array; the loop body is O(1) and runs exactly n times.
+</div>
+
+<div class="card">
+<div class="tag">Info2::Complexity_and_Correctness</div>
+<div class="question"><b>Time complexity</b> — What is the complexity of this code?
+<pre><code>for (int i = 0; i &lt; n; i++) {
+    for (int j = n; j &gt; 1; j = j / 2) {
+        sum++;
+    }
+}</code></pre></div>
+<b>O(n log n)</b> — linearithmic.<br><br>
+Outer loop: n iterations.<br>
+Inner loop: log n iterations (j is halved each step).<br>
+Total: n · log n.
+</div>
+
+<div class="card">
+<div class="tag">Info2::Complexity_and_Correctness</div>
+<div class="question"><b>Time complexity</b> — What is the complexity of this code?
+<pre><code>for (int i = 0; i &lt; n; i++) {
+    for (int j = 0; j &lt; n; j++) {
+        sum++;
+    }
+}</code></pre></div>
+<b>O(n²)</b> — quadratic.<br><br>
+Two nested loops, each running n times → n · n = n² body executions.
+</div>
+
+<div class="card">
+<div class="tag">Info2::Complexity_and_Correctness</div>
+<div class="question"><b>Time complexity</b> — What is the complexity of this code?
+<pre><code>for (int i = 0; i &lt; n; i++) {
+    for (int j = 0; j &lt; n; j++) {
+        for (int k = 0; k &lt; n; k++) {
+            sum++;
+        }
+    }
+}</code></pre></div>
+<b>O(n³)</b> — cubic.<br><br>
+Three nested loops, each running n times → n · n · n = n³ body executions.
+</div>
+
+<div class="card">
+<div class="tag">Info2::Complexity_and_Correctness</div>
+<div class="question"><b>Time complexity</b> — What is the complexity of this code?
+<pre><code>int fib(int n) {
+    if (n &lt;= 1) return n;
+    return fib(n - 1) + fib(n - 2);
+}</code></pre></div>
+<b>O(2ⁿ)</b> — exponential.<br><br>
+Each call spawns 2 recursive calls and the recursion depth is ≈ n → the call tree has ≈ 2ⁿ nodes.<br>
+(More precisely Θ(φⁿ) with φ ≈ 1.618 — the golden ratio — but in O-notation we say O(2ⁿ).)
+</div>
+
+<div class="card">
+<div class="tag">Info2::Complexity_and_Correctness</div>
+<div class="question"><b>Time complexity</b> — What is the complexity of this code?
+<pre><code>void permute(int a[], int l, int n) {
+    if (l == n - 1) { print(a, n); return; }
+    for (int i = l; i &lt; n; i++) {
+        int tmp = a[l]; a[l] = a[i]; a[i] = tmp;
+        permute(a, l + 1, n);
+        tmp = a[l]; a[l] = a[i]; a[i] = tmp;
+    }
+}</code></pre></div>
+<b>O(n!)</b> — factorial.<br><br>
+Generates every permutation of the array. At depth k there are (n − k) remaining choices, so the total number of leaf calls equals n · (n−1) · ... · 1 = n!
+</div>
+
+<div class="card">
+<div class="tag">Info2::Complexity_and_Correctness</div>
+<div class="question"><b>Correctness</b> — What is an <i>up-loop</i> vs a <i>down-loop</i>? Give a small example of each and say what the invariant looks like.</div>
+<b>Up-loop</b> — the counter <b>increases</b> from a lower bound to an upper bound. The invariant typically describes the PREFIX <code>a[0..i-1]</code>.
+<pre><code>for (int i = 0; i &lt; n; i++) {
+    // invariant: a[0..i-1] already processed
+}</code></pre>
+<b>Down-loop</b> — the counter <b>decreases</b> from a higher bound to a lower bound. The invariant typically describes the SUFFIX <code>a[i+1..n-1]</code>.
+<pre><code>for (int i = n - 1; i &gt;= 0; i--) {
+    // invariant: a[i+1..n-1] already processed
+}</code></pre>
+Both are equally expressive — pick whichever direction makes the invariant easier to write. Heap sort's main loop is a down-loop because the sorted suffix grows from the right end of the array.
+</div>
+
+<div class="card">
+<div class="tag">Info2::Complexity_and_Correctness</div>
+<div class="question"><b>Correctness</b> — Define <i>precondition</i>, <i>postcondition</i>, and <i>assertion</i>. Then write them for an iterative <code>binary_search</code>.</div>
+<b>Definitions:</b>
+<ul>
+<li><b>Precondition</b> — what must be TRUE <i>before</i> the algorithm runs. The assumption it relies on.</li>
+<li><b>Postcondition</b> — what is guaranteed to be TRUE <i>after</i> the algorithm returns.</li>
+<li><b>Assertion</b> — a statement that must be TRUE at a specific point <i>during</i> execution (in C: <code>assert(...)</code>).</li>
+</ul>
+<b>Example — binary_search:</b>
+<pre><code>// PRECONDITION:
+//   a != NULL, n &gt;= 0, and a[0..n-1] is sorted
+//   in non-decreasing order.
+int binary_search(int a[], int n, int x) {
+    int lo = 0, hi = n - 1;
+    while (lo &lt;= hi) {
+        // ASSERTION: 0 &lt;= lo  and  hi &lt; n
+        int mid = lo + (hi - lo) / 2;
+        if (a[mid] == x) return mid;
+        if (a[mid] &lt;  x) lo = mid + 1;
+        else             hi = mid - 1;
+    }
+    return -1;
+}
+// POSTCONDITION:
+//   returns an index i with a[i] == x,
+//   or -1 if x does not occur in a.</code></pre>
+</div>
+
+<div class="card">
+<div class="tag">Info2::Complexity_and_Correctness</div>
+<div class="question"><b>Correctness</b> — What is a <i>loop invariant</i>? Name the 3 things you must prove. Illustrate with binary_search.</div>
+<b>Loop invariant:</b> a property that holds before the loop starts, stays true after every iteration, and helps prove correctness when the loop exits.
+<br><br>
+<b>3 things to prove:</b>
+<ol>
+<li><b>Initialization:</b> the invariant holds <i>before</i> the first iteration.</li>
+<li><b>Maintenance:</b> if it holds at the START of an iteration, it still holds at the END (so it holds before the next iteration).</li>
+<li><b>Termination:</b> when the loop exits, the invariant combined with the loop's exit condition implies the postcondition. (And the loop must actually terminate — usually a strictly decreasing &quot;variant&quot; proves this.)</li>
+</ol>
+<b>Binary search — invariant:</b> &quot;If x occurs in a, then x is in <code>a[lo..hi]</code>.&quot;
+<ul>
+<li><b>Initialization:</b> lo = 0, hi = n − 1 → <code>a[lo..hi]</code> is the entire array. Trivially holds.</li>
+<li><b>Maintenance:</b> if a[mid] &lt; x, x can only be in <code>a[mid+1..hi]</code> → set lo = mid + 1 (symmetric for &gt;). Invariant preserved.</li>
+<li><b>Termination:</b> loop ends when lo &gt; hi → <code>a[lo..hi]</code> is empty. By the invariant, x is not in a → return −1. (The variant <code>hi − lo</code> strictly decreases each iteration → termination guaranteed.)</li>
+</ul>
+</div>
+
+<div class="card">
+<div class="tag">Info2::Complexity_and_Correctness</div>
+<div class="question"><b>Testing</b> — Name 7 typical special / edge cases to consider when testing an algorithm (and why each one matters).</div>
+<ol>
+<li><b>Empty array (n = 0):</b> does the code handle 0-length input without crashing or returning garbage?</li>
+<li><b>One element (n = 1):</b> smallest non-empty case; often the base case of recursions or the boundary of loops.</li>
+<li><b>Full / very large array:</b> stresses recursion depth, integer overflow, and quadratic blow-ups that don't show on small inputs.</li>
+<li><b>Already sorted:</b> best case for some algorithms (insertion sort), but the classic <b>worst case</b> for quicksort with first/last pivot.</li>
+<li><b>Reverse-sorted:</b> worst case for many &quot;optimistic&quot; algorithms; tests that swaps and comparisons work in the hardest direction.</li>
+<li><b>Duplicates / all elements equal:</b> does partitioning still terminate? Does the algorithm still return a correct result when many keys tie?</li>
+<li><b>Negative values (and zero):</b> sign assumptions can silently break correctness — e.g. counting sort and direct-address indexing don't handle negatives.</li>
+</ol>
+</div>
+
+<div class="card">
+<div class="tag">Info2::Complexity_and_Correctness</div>
+<div class="question"><b>Asymptotic complexity</b> — Define <b>O</b>, <b>Ω</b>, and <b>Θ</b>. What does each one express?</div>
+For functions f(n), g(n) &gt; 0 as n → ∞:
+<br><br>
+<b>Big O — upper bound:</b><br>
+f(n) ∈ O(g(n)) ⇔ ∃ c &gt; 0, n₀ ≥ 0 such that <b>f(n) ≤ c · g(n)  ∀ n ≥ n₀.</b><br>
+<i>&quot;f grows AT MOST as fast as g.&quot;</i>
+<br><br>
+<b>Big Omega — lower bound:</b><br>
+f(n) ∈ Ω(g(n)) ⇔ ∃ c &gt; 0, n₀ ≥ 0 such that <b>f(n) ≥ c · g(n)  ∀ n ≥ n₀.</b><br>
+<i>&quot;f grows AT LEAST as fast as g.&quot;</i>
+<br><br>
+<b>Big Theta — tight bound:</b><br>
+f(n) ∈ Θ(g(n)) ⇔ f(n) ∈ O(g(n))  <b>AND</b>  f(n) ∈ Ω(g(n)).<br>
+<i>&quot;f grows EXACTLY as fast as g (up to constant factors).&quot;</i>
+<br><br>
+<b>Cheat sheet:</b>
+<ul>
+<li>O  ↔  ≤   (upper bound)</li>
+<li>Ω  ↔  ≥   (lower bound)</li>
+<li>Θ  ↔  =   (tight bound)</li>
+</ul>
+</div>
+
+<div class="card">
+<div class="tag">Info2::Complexity_and_Correctness</div>
+<div class="question"><b>Asymptotic complexity</b> — Prove or disprove:
+<ol>
+<li>2^(n+1) = O(2ⁿ)</li>
+<li>(2²)ⁿ = O(2ⁿ)</li>
+<li>2 · n^(1.5) = O(n log n)</li>
+</ol></div>
+<b>1. 2^(n+1) = O(2ⁿ) — TRUE ✓</b><br>
+2^(n+1) = 2 · 2ⁿ. Choose c = 2, n₀ = 0. Then 2^(n+1) ≤ 2 · 2ⁿ holds for all n ≥ 0. <b>QED</b>
+<br><br>
+<b>2. (2²)ⁿ = O(2ⁿ) — FALSE ✗</b><br>
+(2²)ⁿ = 4ⁿ. Look at the ratio:<br>
+4ⁿ / 2ⁿ = (4/2)ⁿ = 2ⁿ → ∞ as n → ∞.<br>
+So NO constant c can make 4ⁿ ≤ c · 2ⁿ hold for all large n. <b>QED</b>
+<br><br>
+<b>3. 2 · n^(1.5) = O(n log n) — FALSE ✗</b><br>
+Ratio:<br>
+n^(1.5) / (n log n) = √n / log n → ∞ as n → ∞.<br>
+(Every positive power of n eventually beats every polylog.) So no constant c works. <b>QED</b>
+<br><br>
+<b>Key reminders:</b>
+<ul>
+<li>a · cⁿ = O(cⁿ) — constants in the <b>coefficient</b> don't matter.</li>
+<li>aⁿ ≠ O(bⁿ) when a &gt; b — the <b>base</b> of an exponential matters.</li>
+<li>n^ε (any ε &gt; 0) eventually beats every polylog.</li>
+</ul>
+</div>
+
+<div class="card">
+<div class="tag">Info2::Complexity_and_Correctness</div>
+<div class="question"><b>Asymptotic complexity</b> — Determine the Θ(·) of each formula and justify briefly. (3 standard + 2 tricky)
+<ol>
+<li>n^k + cⁿ      (k constant, c &gt; 1)</li>
+<li>log^k n + n^ε  (ε &gt; 0)</li>
+<li>80·n² log n + 5·n² + n</li>
+<li>log(n!)</li>
+<li>2^(log₂ n) + n</li>
+</ol></div>
+<b>1.</b> n^k + cⁿ  →  <b>Θ(cⁿ)</b><br>
+Any exponential beats any polynomial: cⁿ ≫ n^k for large n. The polynomial is the lower-order term and is absorbed.
+<br><br>
+<b>2.</b> log^k n + n^ε  →  <b>Θ(n^ε)</b><br>
+Any positive power of n grows faster than any polylog (polynomial in log n). So n^ε dominates.
+<br><br>
+<b>3.</b> 80·n² log n + 5·n² + n  →  <b>Θ(n² log n)</b><br>
+Drop constants and keep the highest-order term. Ranking: n² log n ≻ n² ≻ n.
+<br><br>
+<b>4.</b> log(n!)  →  <b>Θ(n log n)</b><br>
+By Stirling: n! ≈ √(2πn) · (n/e)ⁿ, so log(n!) ≈ n log n − n + ½ log n + O(1). Dominant term: n log n. <i>(This is exactly why comparison sorting has the Ω(n log n) lower bound.)</i>
+<br><br>
+<b>5.</b> 2^(log₂ n) + n  →  <b>Θ(n)</b><br>
+By definition of the logarithm: 2^(log₂ n) = n. So the whole expression is n + n = 2n.<br>
+<i>Watch out:</i> 2^(log n) only equals n when the log's base is 2.
+<br><br>
+<b>Cheat sheet — dominance ladder (left grows slower):</b><br>
+1 ≪ log n ≪ log² n ≪ √n ≪ n ≪ n log n ≪ n² ≪ n³ ≪ 2ⁿ ≪ 3ⁿ ≪ n! ≪ nⁿ
+</div>
+
+<div class="card">
+<div class="tag">Info2::Complexity_and_Correctness</div>
+<div class="question"><b>Asymptotic complexity</b> — Calculate the asymptotic tight bound for the following functions and rank them by order of growth (lowest first). Work it out step by step.
+<ol>
+<li><code>f₁(n) = 10 lg(20n⁴) + 8229n³ + 20231n² + 128n log n</code></li>
+<li><code>f₂(n) = log₂(n) + 50√n + log n</code></li>
+<li><code>f₃(n) = 14400</code></li>
+<li><code>f₄(n) = 2 log(6 log n²) + log(πn²) + 4(log n)²</code></li>
+<li><code>f₅(n) = (2n + 3)!</code></li>
+</ol></div>
+<b>Step-by-step simplification:</b>
+<br><br>
+<b>1. f₁(n)</b>
+<pre><code>f₁(n) = 10 lg(20n⁴) + 8229n³ + 20231n² + 128n log n
+
+10 lg(20n⁴)
+= 10 [lg 20 + lg(n⁴)]
+= 10 [constant + 4 lg n]
+= Θ(log n)</code></pre>
+So
+<pre><code>f₁(n) = Θ(log n) + Θ(n³) + Θ(n²) + Θ(n log n)</code></pre>
+Dominant term: <code>n³</code>
+<pre><code>f₁(n) = Θ(n³)</code></pre>
+
+<b>2. f₂(n)</b>
+<pre><code>f₂(n) = log₂(n) + 50√n + log n
+      = Θ(log n) + Θ(√n) + Θ(log n)</code></pre>
+Since <code>√n</code> grows faster than <code>log n</code>,
+<pre><code>f₂(n) = Θ(√n)</code></pre>
+
+<b>3. f₃(n)</b>
+<pre><code>f₃(n) = 14400 = constant</code></pre>
+Therefore
+<pre><code>f₃(n) = Θ(1)</code></pre>
+
+<b>4. f₄(n)</b>
+<pre><code>f₄(n) = 2 log(6 log n²) + log(πn²) + 4(log n)²</code></pre>
+First term:
+<pre><code>2 log(6 log n²)
+= 2 log(6 · 2 log n)
+= 2 log(12 log n)
+= Θ(log log n)</code></pre>
+Second term:
+<pre><code>log(πn²)
+= log π + log(n²)
+= constant + 2 log n
+= Θ(log n)</code></pre>
+Third term:
+<pre><code>4(log n)² = Θ(log² n)</code></pre>
+So
+<pre><code>f₄(n) = Θ(log log n) + Θ(log n) + Θ(log² n)</code></pre>
+Dominant term: <code>log² n</code>
+<pre><code>f₄(n) = Θ(log² n)</code></pre>
+
+<b>5. f₅(n)</b>
+<pre><code>f₅(n) = (2n + 3)!</code></pre>
+Shifting or multiplying the argument by a constant does not change the fact that this is factorial growth.
+<pre><code>f₅(n) = Θ((2n + 3)!)</code></pre>
+This grows much faster than any polynomial or polylogarithm.
+
+<b>Ranking by growth (lowest first):</b>
+<pre><code>f₃(n) &lt; f₄(n) &lt; f₂(n) &lt; f₁(n) &lt; f₅(n)</code></pre>
+or equivalently
+<pre><code>Θ(1) &lt; Θ(log² n) &lt; Θ(√n) &lt; Θ(n³) &lt; Θ((2n + 3)!)</code></pre>
+
+<b>Quick comparison facts used:</b>
+<pre><code>1 &lt; log n &lt; log² n &lt; √n &lt; n &lt; n log n &lt; n² &lt; n³ &lt; ... &lt; n! </code></pre>
+</div>
+
+<div class="card">
+<div class="tag">Info2::Complexity_and_Correctness</div>
+<div class="question"><b>Algorithm design</b> — Given an array A of n integers and an integer c, decide whether any TWO elements of A sum to c.<br>
+(a) Write <code>pairSum</code> for the general case in C.<br>
+(b) If A is sorted (non-decreasing), write a faster <code>pairSumSorted</code> in C.<br>
+(c) Give the worst-case complexity of each.</div>
+<b>(a) pairSum — generic O(n²) version (check every pair):</b>
+<pre><code>int pairSum(int A[], int n, int c) {
+    // try every unordered pair (i, j) with i &lt; j
+    for (int i = 0; i &lt; n - 1; i++) {
+        for (int j = i + 1; j &lt; n; j++) {
+            if (A[i] + A[j] == c) return 1;   // found a pair
+        }
+    }
+    return 0;                                  // no such pair
+}</code></pre>
+<b>(b) pairSumSorted — two-pointer O(n) version (exploits sortedness):</b><br>
+Idea: place a pointer at the smallest element (lo) and another at the largest (hi). If their sum is TOO SMALL, the only way to make it larger is to move lo to the right (a bigger value). If TOO LARGE, move hi to the left.
+<pre><code>int pairSumSorted(int A[], int n, int c) {
+    int lo = 0, hi = n - 1;
+    while (lo &lt; hi) {
+        int sum = A[lo] + A[hi];
+        if (sum == c) return 1;
+        if (sum &lt;  c) lo++;     // need a larger sum
+        else          hi--;     // need a smaller sum
+    }
+    return 0;
+}</code></pre>
+<b>(c) Worst-case complexity (input sorted):</b>
+<ul>
+<li><b>pairSum: O(n²)</b> — examines every unordered pair, regardless of sortedness.</li>
+<li><b>pairSumSorted: O(n)</b> — each iteration advances exactly one of the two pointers; together they can move at most n − 1 steps before meeting.</li>
+</ul>
+<b>Correctness of the two-pointer trick:</b> we never miss a solution because at the boundary, moving lo right OR hi left changes the sum in only ONE direction — and the values we &quot;skip&quot; were already proven not to be part of any solution.
+</div>
+
+<!-- ===================== RECURRENCES ===================== -->
+
+<div class="card">
+<div class="tag">Info2::Recurrences</div>
+<div class="question"><b>Recurrences</b> — How does repeated substitution work in principle? Solve <code>T(n) = 2T(n/2) + c n</code> with repeated substitution. (4 steps + final result)</div>
+<b>Repeated substitution: 4 steps</b>
+<ol>
+<li><b>Expand once or twice</b> so you see the pattern.</li>
+<li><b>Write the i-th expansion</b> with a general exponent / coefficient.</li>
+<li><b>Stop at the base case</b> by solving for i.</li>
+<li><b>Simplify</b> the final expression and keep the dominant term.</li>
+</ol>
+<b>Example:</b>
+<pre><code>T(n) = 2T(n/2) + c n
+
+= 2[ T(n/4) + c(n/2) ] + c n
+= 2² T(n/4) + 2 c n
+
+= 2²[ T(n/8) + c(n/4) ] + 2 c n
+= 2³ T(n/8) + 3 c n
+
+After i steps:
+T(n) = 2^i T(n / 2^i) + i c n</code></pre>
+Now stop when <code>n / 2^i = 1</code>. Then <code>2^i = n</code>, so <code>i = log₂ n</code>.
+<pre><code>T(n) = 2^(log₂ n) T(1) + c n log₂ n
+     = n T(1) + c n log₂ n</code></pre>
+If <code>T(1) = d</code> is a constant, then
+<pre><code>T(n) = d n + c n log n = Θ(n log n)</code></pre>
+<b>Key idea:</b> each level contributes another <code>c n</code>, and there are <code>log n</code> levels.
+</div>
+
+<div class="card">
+<div class="tag">Info2::Recurrences</div>
+<div class="question"><b>Recurrences</b> — Practice: state the recurrence (including the base case) for this algorithm.
+<pre><code>int mystery(int A[], int lo, int hi) {
+    if (lo == hi) return A[lo];
+    int mid = lo + (hi - lo) / 2;
+    int left  = mystery(A, lo, mid);
+    int right = mystery(A, mid + 1, hi);
+    int sum = 0;
+    for (int i = lo; i &lt;= hi; i++) {
+        sum += A[i];
+    }
+    return left + right + sum;
+}</code></pre></div>
+<b>Recurrence:</b>
+<pre><code>T(1) = c
+T(n) = 2T(n/2) + c n</code></pre>
+<b>Why?</b>
+<ul>
+<li><b>2T(n/2)</b> because the function recursively solves the left half and the right half.</li>
+<li><b>+ c n</b> because after the two recursive calls it runs one loop over the whole current subarray.</li>
+<li><b>T(1) = c</b> because when only one element is left, the function does constant work and returns immediately.</li>
+</ul>
+<b>General rule:</b> when writing a recurrence, count:
+<ol>
+<li>How many recursive calls?</li>
+<li>What size does each subproblem have?</li>
+<li>How much non-recursive work happens outside the calls?</li>
+</ol>
+</div>
+
+<div class="card">
+<div class="tag">Info2::Recurrences</div>
+<div class="question"><b>Recurrences</b> — How does substitution with guessing work? Solve <code>T(n) = 4T(n/2) + n</code> with guessing + induction, and explain how to make good guesses. (4 steps + guess tips + result)</div>
+<b>Substitution with guessing: 4 steps</b>
+<ol>
+<li><b>Guess</b> the asymptotic answer.</li>
+<li><b>Assume</b> the guess is true for smaller inputs.</li>
+<li><b>Substitute</b> that assumption into the recurrence.</li>
+<li><b>Choose constants</b> so the induction closes.</li>
+</ol>
+<b>How to make a good guess:</b>
+<ul>
+<li>Compare with <code>n^(log_b a)</code> if the recurrence has the form <code>aT(n/b)+f(n)</code>.</li>
+<li>Expand the first 2-3 levels and look for a pattern.</li>
+<li>Use a recurrence tree mentally: does the work per level grow, stay equal, or shrink?</li>
+<li>Start with the dominant term and ignore lower-order details at first.</li>
+</ul>
+<b>Example:</b> <code>T(n) = 4T(n/2) + n</code><br>
+Here <code>a = 4</code>, <code>b = 2</code>, so <code>n^(log_b a) = n²</code>. Good guess: <code>T(n) = Θ(n²)</code>.
+<br><br>
+<b>Upper bound O(n²):</b><br>
+Assume for all smaller inputs that <code>T(m) ≤ C m² - m</code>.
+Then
+<pre><code>T(n) = 4T(n/2) + n
+     ≤ 4[ C(n/2)² - n/2 ] + n
+     = C n² - n</code></pre>
+So <code>T(n) ≤ C n²</code>.
+<br><br>
+<b>Lower bound Ω(n²):</b><br>
+Assume for all smaller inputs that <code>T(m) ≥ c m²</code>.
+Then
+<pre><code>T(n) = 4T(n/2) + n
+     ≥ 4 c (n/2)² + n
+     = c n² + n
+     ≥ c n²</code></pre>
+So <code>T(n) ∈ Ω(n²)</code>.
+<br><br>
+Since both bounds hold:
+<pre><code>T(n) = Θ(n²)</code></pre>
+</div>
+
+<div class="card">
+<div class="tag">Info2::Recurrences</div>
+<div class="question"><b>Recurrences</b> — How do you solve a recurrence with a recurrence tree? Solve <code>T(n) = T(n/4) + T(n/2) + n²</code>. (root, first layer, second layer, general layer, result)</div>
+<b>Recurrence-tree idea:</b> write the work done on each layer, then sum over all layers.
+<br><br>
+<b>Root:</b>
+<pre><code>cost = n²</code></pre>
+<b>First layer: 2 nodes</b>
+<pre><code>T(n/4) contributes (n/4)² = n²/16
+T(n/2) contributes (n/2)² = n²/4
+Layer total = n²/16 + n²/4 = 5n²/16</code></pre>
+<b>Second layer: 4 nodes</b>
+The two children split again into sizes
+<pre><code>n/16, n/8, n/8, n/4</code></pre>
+so the cost on that layer is
+<pre><code>(n/16)² + (n/8)² + (n/8)² + (n/4)²
+= n²/256 + n²/64 + n²/64 + n²/16
+= 25n²/256
+= (5/16)² n²</code></pre>
+<b>Pattern:</b><br>
+Each layer is multiplied by <code>5/16</code>, because
+<pre><code>(1/4)² + (1/2)² = 1/16 + 1/4 = 5/16</code></pre>
+So the i-th layer costs
+<pre><code>(5/16)^i n²</code></pre>
+Total:
+<pre><code>T(n) = n² [ 1 + 5/16 + (5/16)² + ... ]</code></pre>
+This is a geometric series with ratio <code>5/16 &lt; 1</code>, so it converges to a constant.
+Therefore
+<pre><code>T(n) = Θ(n²)</code></pre>
+<b>Key intuition:</b> the root already dominates, because the total work shrinks by the constant factor <code>5/16</code> from one level to the next.
+</div>
+
+<div class="card">
+<div class="tag">Info2::Recurrences</div>
+<div class="question"><b>Recurrences</b> — How does the master method work? State the 3 cases, say when the extra check is needed, explain what <code>T(1)</code> means, and solve <code>T(n) = 4T(n/2) + n² log³ n</code>. (2 parameters, 3 cases, 1 extra check, result)</div>
+<b>Master method setup:</b><br>
+For recurrences of the form
+<pre><code>T(n) = a T(n/b) + f(n)</code></pre>
+<ul>
+<li><code>a</code> = number of recursive calls</li>
+<li><code>b</code> = factor by which the input size shrinks</li>
+<li><code>f(n)</code> = non-recursive work done at one node</li>
+</ul>
+Compute the comparison term
+<pre><code>n^(log_b a)</code></pre>
+Then compare <code>f(n)</code> with that term.
+<br><br>
+<b>Case 1:</b> <code>f(n) = O(n^(log_b a - ε))</code> for some <code>ε &gt; 0</code><br>
+Then
+<pre><code>T(n) = Θ(n^(log_b a))</code></pre>
+<b>Case 2:</b> <code>f(n) = Θ(n^(log_b a) log^k n)</code> for some <code>k ≥ 0</code><br>
+Then
+<pre><code>T(n) = Θ(n^(log_b a) log^(k+1) n)</code></pre>
+<b>Case 3:</b> <code>f(n) = Ω(n^(log_b a + ε))</code> for some <code>ε &gt; 0</code><br>
+and additionally
+<pre><code>a f(n/b) ≤ c f(n)</code></pre>
+for some constant <code>c &lt; 1</code> and all sufficiently large <code>n</code>.<br>
+Then
+<pre><code>T(n) = Θ(f(n))</code></pre>
+<b>Extra check:</b> that regularity condition is needed in <b>Case 3</b>.
+<br><br>
+<b>What does T(1) mean?</b><br>
+It is the running time of the <b>base case</b>: when the input size is 1, recursion stops and only constant work remains. In the recursion tree it is the cost stored in each leaf.
+<br><br>
+<b>Example:</b> <code>T(n) = 4T(n/2) + n² log³ n</code><br>
+Here
+<pre><code>a = 4,  b = 2
+n^(log_b a) = n^(log₂ 4) = n²</code></pre>
+Also
+<pre><code>f(n) = n² log³ n = Θ( n^(log_b a) log³ n )</code></pre>
+So this is <b>Case 2</b> with <code>k = 3</code>.
+Therefore
+<pre><code>T(n) = Θ(n² log^4 n)</code></pre>
+</div>
+
+<div class="card">
+<div class="tag">Info2::Recurrences</div>
+<div class="question"><b>Recurrences</b> — The maximum-subarray algorithm finds the contiguous subarray that has the largest sum within an unsorted array <code>A</code> with <code>n</code> integers. For example, for array <code>A = [-2, -5, 6, -2, -3, 1, 5]</code>, the maximum subarray is <code>[6, -2, -3, 1, 5]</code>.<br><br>
+The algorithm works as follows:<br>
+Firstly, it divides the input array into two equal partitions: I (<code>A[0]...A[mid]</code>) and II (<code>A[mid+1]...A[n-1]</code>). Afterwards, it calls itself recursively on both partitions to find the maximum subarray of each partition. The combination step decides the maximum-subarray by comparing three arrays: the maximum-subarray from the left part, the maximum-subarray from the right part, and the maximum-subarray that overlaps the middle. The maximum-subarray that overlaps the middle is determined by considering all elements to the left and all elements to the right of the middle.<br><br>
+2.2 Provide C code for the maximum-subarray algorithm.<br>
+2.3 What is the recurrence relation of the algorithm and its asymptotic tight bound?</div>
+<b>Idea in simple words:</b>
+<ul>
+<li>Split the array into a left half and a right half.</li>
+<li>Recursively compute the best subarray fully inside the left half.</li>
+<li>Recursively compute the best subarray fully inside the right half.</li>
+<li>Also compute the best subarray that <b>crosses the middle</b>: it must end at <code>mid</code> on the left side and start at <code>mid+1</code> on the right side.</li>
+<li>The overall answer is the best of those three candidates.</li>
+</ul>
+<b>C code:</b>
+<pre><code>int maxOverlapArraySum(int arr[], int l, int m, int r) {
+    // sum = running sum while we scan away from the middle
+    // left_sum / right_sum = best sums found on each side
+    int sum = 0;
+    int left_sum = -50000;   // acts like -infinity
+
+    // start at the middle and extend to the LEFT
+    // this finds the best subarray that ENDS at index m
+    for (int i = m; i >= l; i--) {
+        sum = sum + arr[i];
+        if (sum > left_sum) {
+            left_sum = sum;
+        }
+    }
+
+    // reset sum before scanning the right side
+    sum = 0;
+    int right_sum = -50000;  // acts like -infinity
+
+    // start just right of the middle and extend to the RIGHT
+    // this finds the best subarray that STARTS at index m+1
+    for (int i = m + 1; i <= r; i++) {
+        sum = sum + arr[i];
+        if (sum > right_sum) {
+            right_sum = sum;
+        }
+    }
+
+    // the best crossing subarray must use both the best left part
+    // and the best right part
+    return left_sum + right_sum;
+}
+
+int maxSubArraySum(int arr[], int l, int r) {
+    // base case: with one element, the best subarray is the element itself
+    if (l == r) {
+        return arr[l];
+    }
+
+    // split current interval into two halves
+    int m = (l + r) / 2;
+
+    // recursively solve left half, right half, and crossing case
+    int leftArraySum = maxSubArraySum(arr, l, m);
+    int rightArraySum = maxSubArraySum(arr, m + 1, r);
+    int overlapArraySum = maxOverlapArraySum(arr, l, m, r);
+
+    // return the largest of the three candidates
+    if (leftArraySum >= rightArraySum && leftArraySum >= overlapArraySum) {
+        return leftArraySum;
+    } else if (rightArraySum >= leftArraySum && rightArraySum >= overlapArraySum) {
+        return rightArraySum;
+    }
+    return overlapArraySum;
+}
+
+// initial call:
+// int max_sum = maxSubArraySum(arr, 0, n - 1);</code></pre>
+<b>Recurrence:</b>
+<pre><code>T(1) = Θ(1)
+T(n) = 2T(n/2) + Θ(n)</code></pre>
+<b>Why this recurrence?</b>
+<ul>
+<li><code>2T(n/2)</code> because the algorithm recursively solves the left half and the right half.</li>
+<li><code>+ Θ(n)</code> because the crossing subarray is computed by one scan to the left and one scan to the right of the middle, together linear in the current subproblem size.</li>
+</ul>
+<b>Step-by-step derivation of the bound:</b>
+<pre><code>T(n) = 2T(n/2) + c n</code></pre>
+Use the Master Method:
+<pre><code>a = 2,  b = 2
+n^(log_b a) = n^(log₂ 2) = n</code></pre>
+Also
+<pre><code>f(n) = c n = Θ(n)</code></pre>
+So
+<pre><code>f(n) = Θ(n^(log_b a))</code></pre>
+This is <b>Master Method Case 2</b> with <code>k = 0</code>, hence
+<pre><code>T(n) = Θ(n log n)</code></pre>
+<b>Final answer:</b>
+<pre><code>Recurrence: T(n) = 2T(n/2) + Θ(n)
+Asymptotic tight bound: Θ(n log n)</code></pre>
+</div>
+
+<div class="card">
+<div class="tag">Info2::Recurrences</div>
+<div class="question"><b>Recurrences</b> — Write a recursive function that reduces an integer array by summing neighbouring elements, so that the rows form a pyramid. Explain the idea simply before the code. (idea + code)</div>
+<b>Simple idea:</b>
+<ul>
+<li>From an array of length <code>n</code>, build a new array of length <code>n-1</code>.</li>
+<li>The new element at index <code>i</code> is the sum of its two neighbours below it: <code>A[i] + A[i+1]</code>.</li>
+<li>Repeat recursively until the array becomes empty.</li>
+<li>Print <b>after</b> the recursive call, so the smallest row appears first and the pyramid is printed from top to bottom.</li>
+</ul>
+<b>C code:</b>
+<pre><code>void draw_pyramid(const int A[], int n, int level) {
+    // base case: nothing to print / reduce
+    if (n &lt; 1) {
+        return;
+    }
+
+    // recursive case: build reduced array of length n-1, then recurse
+    int t[n - 1];
+    for (int i = 0; i &lt; n - 1; i++) {
+        t[i] = A[i] + A[i + 1];
+    }
+
+    draw_pyramid(t, n - 1, level + 1);
+
+    // print AFTER recursion so that top of pyramid appears first (top-down)
+    print_level(A, n, level);
+}</code></pre>
+<b>Why does printing happen after recursion?</b><br>
+If you printed first, you would print the bottom row first. By printing on the way back up, the smallest reduced row is printed first, then the larger ones underneath it.
+</div>
+
+<!-- ===================== ABSTRACT DATA TYPES ===================== -->
+
+<div class="card">
+<div class="tag">Info2::Abstract_Data_Types</div>
+<div class="question"><b>Pointers</b> — Fill in the blanks. (All in one card)<br><br>
+A pointer is a variable that stores the <b>[what?]</b> of another variable.<br>
+If <code>int x = 7;</code>, then <code>&amp;x</code> means the <b>[what?]</b> of <code>x</code>.<br>
+If <code>int *p = &amp;x;</code>, then <code>p</code> stores the <b>[what?]</b> of <code>x</code>.<br>
+The notation <code>*p</code> means the <b>[what?]</b> stored at the address inside <code>p</code>.<br>
+The type <code>int *</code> means: <b>[what kind of thing?]</b> to <code>int</code>.<br>
+The symbol used to declare a pointer is <b>[which symbol?]</b>.<br>
+If <code>struct node *p;</code>, then <code>p-&gt;a</code> means the same as <b>[equivalent expression?]</b>.<br>
+Explain briefly how address vs. pointer vs. value-at-address differ.</div>
+<b>Completed text:</b><br><br>
+A pointer is a variable that stores the <b>address</b> of another variable.<br>
+If <code>int x = 7;</code>, then <code>&amp;x</code> means the <b>address</b> of <code>x</code>.<br>
+If <code>int *p = &amp;x;</code>, then <code>p</code> stores the <b>address</b> of <code>x</code>.<br>
+The notation <code>*p</code> means the <b>value</b> stored at the address inside <code>p</code>.<br>
+The type <code>int *</code> means: <b>pointer</b> to <code>int</code>.<br>
+The symbol used to declare a pointer is <b>*</b>.<br>
+If <code>struct node *p;</code>, then <code>p-&gt;a</code> means the same as <b><code>(*p).a</code></b>.<br><br>
+<b>Address vs. pointer vs. value-at-address:</b>
+<ul>
+<li><b>Address:</b> the memory location of a variable, e.g. <code>&amp;x</code>.</li>
+<li><b>Pointer:</b> a variable whose content is such an address, e.g. <code>p</code>.</li>
+<li><b>Value at address:</b> the actual object stored there, accessed by dereferencing, e.g. <code>*p</code>.</li>
+</ul>
+<b>Mini example:</b>
+<pre><code>int x = 7;
+int *p = &amp;x;
+
+// &amp;x  = address of x
+// p   = same address
+// *p  = 7</code></pre>
+</div>
+
+<div class="card">
+<div class="tag">Info2::Abstract_Data_Types</div>
+<div class="question"><b>Pointers</b> — How do double pointers work? Explain <code>int **p</code>, <code>**p</code>, and why double pointers are useful in code. In particular, explain the case where a tree node itself may change.</div>
+<b>Core idea:</b><br>
+A <b>double pointer</b> stores the address of a pointer.
+<pre><code>int x = 20;
+int *q = &amp;x;    // q points to x
+int **p = &amp;q;   // p points to q</code></pre>
+Then:
+<ul>
+<li><code>q</code> is an address of an <code>int</code>.</li>
+<li><code>*q</code> is the integer value stored there.</li>
+<li><code>p</code> is an address of a pointer.</li>
+<li><code>*p</code> is the pointer <code>q</code>.</li>
+<li><code>**p</code> is the integer value behind <code>q</code>, so here <code>**p = 20</code>.</li>
+</ul>
+<b>Small example:</b>
+<pre><code>int x = 20;
+int *q = &amp;x;
+int **p = &amp;q;
+
+printf("%d\\n", **p);   // 20
+**p = 99;               // changes x through two dereferences</code></pre>
+<b>Why useful?</b>
+<ul>
+<li>Whenever a function must be able to change a pointer owned by the caller.</li>
+<li>Typical cases: inserting into a linked list, changing the root of a tree, allocating memory and storing the new pointer back.</li>
+</ul>
+<b>Tree example:</b><br>
+Suppose a tree is represented by a pointer to its root:
+<pre><code>struct node {
+    int key;
+    struct node *left, *right;
+};</code></pre>
+If a function may need to create the root node when the tree is empty, then it must be able to change the caller's root pointer itself:
+<pre><code>void insert_root_if_empty(struct node **root, int x) {
+    if (*root == NULL) {
+        *root = malloc(sizeof(struct node));
+        (*root)-&gt;key = x;
+        (*root)-&gt;left = NULL;
+        (*root)-&gt;right = NULL;
+    }
+}</code></pre>
+Why <code>struct node **root</code>? Because:
+<ul>
+<li><code>root</code> = address of the caller's root pointer</li>
+<li><code>*root</code> = the actual root pointer</li>
+<li><code>**root</code> would be the actual node data if you dereference further</li>
+</ul>
+If you passed only <code>struct node *root</code>, the function would receive a copy of the pointer and could not replace the caller's root.
+</div>
+
+<div class="card">
+<div class="tag">Info2::Abstract_Data_Types</div>
+<div class="question"><b>Linked List</b> — What is the structure of a singly linked list in C, and how do you access one specific value?</div>
+<b>Structure:</b>
+<pre><code>typedef struct node {
+    int value;
+    struct node *next;
+} Node;</code></pre>
+Each node stores:
+<ul>
+<li>a data field (<code>value</code>)</li>
+<li>a pointer to the next node (<code>next</code>)</li>
+</ul>
+The list itself is usually represented by a pointer to the first node:
+<pre><code>Node *head = NULL;</code></pre>
+<b>Access one specific value:</b><br>
+You cannot jump directly to position <code>i</code> like in an array. You must walk node by node.
+<pre><code>int get_at(Node *head, int index) {
+    Node *cur = head;
+
+    // move index steps forward
+    for (int i = 0; i &lt; index; i++) {
+        if (cur == NULL) return -1;   // index out of bounds
+        cur = cur-&gt;next;
+    }
+
+    if (cur == NULL) return -1;       // index out of bounds
+    return cur-&gt;value;
+}</code></pre>
+<b>Key point:</b> accessing index <code>i</code> costs <b>O(i)</b>, because you must follow the links one by one.
+</div>
+
+<div class="card">
+<div class="tag">Info2::Abstract_Data_Types</div>
+<div class="question"><b>Linked List</b> — How do you populate a linked list with items? Code: create a linked list by adding <code>88</code>, <code>52</code>, and <code>12</code>.</div>
+<b>One simple way:</b> create nodes one after another and link them manually.
+<pre><code>#include &lt;stdlib.h&gt;
+
+typedef struct node {
+    int value;
+    struct node *next;
+} Node;
+
+Node *create_example_list(void) {
+    // allocate the three nodes
+    Node *n1 = malloc(sizeof(Node));
+    Node *n2 = malloc(sizeof(Node));
+    Node *n3 = malloc(sizeof(Node));
+
+    // fill their values
+    n1-&gt;value = 88;
+    n2-&gt;value = 52;
+    n3-&gt;value = 12;
+
+    // link them together: 88 -> 52 -> 12 -> NULL
+    n1-&gt;next = n2;
+    n2-&gt;next = n3;
+    n3-&gt;next = NULL;
+
+    // the head points to the first node
+    return n1;
+}</code></pre>
+After this, the list is:
+<pre><code>head -> [88] -> [52] -> [12] -> NULL</code></pre>
+</div>
+
+<div class="card">
+<div class="tag">Info2::Abstract_Data_Types</div>
+<div class="question"><b>Linked List</b> — How do you count the number of occurrences of an element <code>x</code> in a linked list?</div>
+<pre><code>typedef struct node {
+    int value;
+    struct node *next;
+} Node;
+
+int count_occurrences(Node *head, int x) {
+    int count = 0;
+    Node *cur = head;
+
+    // walk through the whole list
+    while (cur != NULL) {
+        if (cur-&gt;value == x) {
+            count++;
+        }
+        cur = cur-&gt;next;
+    }
+
+    return count;
+}</code></pre>
+<b>Idea:</b> scan the whole list and increment a counter whenever the current node contains <code>x</code>.<br>
+<b>Complexity:</b> <code>O(n)</code> time, <code>O(1)</code> extra space.
+</div>
+
+<div class="card">
+<div class="tag">Info2::Abstract_Data_Types</div>
+<div class="question"><b>Linked List</b> — How do you insert an item at the beginning of a linked list?</div>
+<pre><code>#include &lt;stdlib.h&gt;
+
+typedef struct node {
+    int value;
+    struct node *next;
+} Node;
+
+void insert_front(Node **head, int x) {
+    Node *new_node = malloc(sizeof(Node));
+
+    // fill the new node
+    new_node-&gt;value = x;
+
+    // new node points to the old first node
+    new_node-&gt;next = *head;
+
+    // head now becomes the new node
+    *head = new_node;
+}</code></pre>
+<b>Why use <code>Node **head</code>?</b><br>
+Because inserting at the front changes the head pointer itself.<br>
+<b>Complexity:</b> <code>O(1)</code>.
+</div>
+
+<div class="card">
+<div class="tag">Info2::Abstract_Data_Types</div>
+<div class="question"><b>Linked List</b> — How do you append a list <code>L1</code> to a linked list <code>L2</code>? (After the operation, <code>L2</code> should be followed by <code>L1</code>.)</div>
+<pre><code>typedef struct node {
+    int value;
+    struct node *next;
+} Node;
+
+void append_list(Node **L2, Node *L1) {
+    // if L2 is empty, the result is just L1
+    if (*L2 == NULL) {
+        *L2 = L1;
+        return;
+    }
+
+    // find the last node of L2
+    Node *cur = *L2;
+    while (cur-&gt;next != NULL) {
+        cur = cur-&gt;next;
+    }
+
+    // connect the last node of L2 with the first node of L1
+    cur-&gt;next = L1;
+}</code></pre>
+<b>Idea:</b> walk to the end of <code>L2</code>, then set its last <code>next</code> pointer to the head of <code>L1</code>.<br>
+<b>Complexity:</b> <code>O(length(L2))</code> if only the head of <code>L2</code> is known.
+</div>
+
+<div class="card">
+<div class="tag">Info2::Abstract_Data_Types</div>
+<div class="question"><b>Linked List</b> — How do you insert a number at the end of a linked list?</div>
+<pre><code>#include &lt;stdlib.h&gt;
+
+typedef struct node {
+    int value;
+    struct node *next;
+} Node;
+
+void insert_end(Node **head, int x) {
+    Node *new_node = malloc(sizeof(Node));
+    new_node-&gt;value = x;
+    new_node-&gt;next = NULL;
+
+    // empty list: new node becomes the first node
+    if (*head == NULL) {
+        *head = new_node;
+        return;
+    }
+
+    // otherwise walk to the last node
+    Node *cur = *head;
+    while (cur-&gt;next != NULL) {
+        cur = cur-&gt;next;
+    }
+
+    // link the new node at the end
+    cur-&gt;next = new_node;
+}</code></pre>
+<b>Complexity:</b> <code>O(n)</code> if only the head is stored. With an extra tail pointer it can be <code>O(1)</code>.
+</div>
+
+<div class="card">
+<div class="tag">Info2::Abstract_Data_Types</div>
+<div class="question"><b>Linked List</b> — How do you delete an element from a linked list? (Delete the first occurrence of <code>x</code>.)</div>
+<pre><code>#include &lt;stdlib.h&gt;
+
+typedef struct node {
+    int value;
+    struct node *next;
+} Node;
+
+void delete_first(Node **head, int x) {
+    Node *cur = *head;
+    Node *prev = NULL;
+
+    // search for the first node whose value is x
+    while (cur != NULL &amp;&amp; cur-&gt;value != x) {
+        prev = cur;
+        cur = cur-&gt;next;
+    }
+
+    // x not found => nothing to delete
+    if (cur == NULL) {
+        return;
+    }
+
+    // special case: delete the first node
+    if (prev == NULL) {
+        *head = cur-&gt;next;
+    } else {
+        prev-&gt;next = cur-&gt;next;
+    }
+
+    free(cur);
+}</code></pre>
+<b>Key idea:</b> in a singly linked list you must know the predecessor node, because deletion is done by bypassing the current node.
+</div>
+
+<div class="card">
+<div class="tag">Info2::Abstract_Data_Types</div>
+<div class="question"><b>Linked List</b> — How do you delete an entire linked list?</div>
+<pre><code>#include &lt;stdlib.h&gt;
+
+typedef struct node {
+    int value;
+    struct node *next;
+} Node;
+
+void delete_list(Node **head) {
+    Node *cur = *head;
+
+    while (cur != NULL) {
+        Node *next = cur-&gt;next;   // save next before freeing cur
+        free(cur);
+        cur = next;
+    }
+
+    // after deleting all nodes, the list is empty
+    *head = NULL;
+}</code></pre>
+<b>Why set <code>*head = NULL</code>?</b><br>
+So the caller does not keep a dangling pointer to freed memory.<br>
+<b>Complexity:</b> <code>O(n)</code>.
+</div>
+
+<div class="card">
+<div class="tag">Info2::Abstract_Data_Types</div>
+<div class="question"><b>Linked List</b> — What are the costs of these linked-list operations? Assume a singly linked list with only a head pointer. (Insertion at beginning, insertion at end, <code>isEmpty?</code>, delete, print)</div>
+<b>Assumption:</b> singly linked list, only head pointer known, no tail pointer, delete means “delete a value by searching for it”.<br><br>
+<ul>
+<li><b>Insertion at beginning:</b> <code>O(1)</code> — just create a node and change <code>head</code>.</li>
+<li><b>Insertion at end:</b> <code>O(n)</code> — must first walk to the last node.</li>
+<li><b><code>isEmpty?</code>:</b> <code>O(1)</code> — just test whether <code>head == NULL</code>.</li>
+<li><b>Delete:</b> <code>O(n)</code> — usually must search for the node and its predecessor.</li>
+<li><b>Print:</b> <code>O(n)</code> — must visit every node once.</li>
+</ul>
+<b>Important note:</b> if you also store a tail pointer, insertion at end becomes <code>O(1)</code>.
+</div>
+
+<div class="card">
+<div class="tag">Info2::Abstract_Data_Types</div>
+<div class="question"><b>Linked List</b> — Doubly linked list: what is the structure in C, and what is the advantage over a singly linked list?</div>
+<b>Structure:</b>
+<pre><code>typedef struct dnode {
+    int value;
+    struct dnode *prev;
+    struct dnode *next;
+} DNode;</code></pre>
+Each node stores:
+<ul>
+<li>its value</li>
+<li>a pointer to the previous node</li>
+<li>a pointer to the next node</li>
+</ul>
+<b>Main advantage:</b><br>
+Insertion and deletion take <b>O(1)</b> <b>if the node is already known</b>, because you do not need to search for its predecessor.
+<br><br>
+<b>Why exactly?</b><br>
+In a singly linked list, if you want to delete node <code>cur</code>, you must know the node before it in order to change its <code>next</code> pointer. That predecessor is not directly stored, so you often need an extra search.<br><br>
+In a doubly linked list, <code>cur-&gt;prev</code> gives the predecessor immediately, so you can splice <code>cur</code> out in constant time:
+<pre><code>cur-&gt;prev-&gt;next = cur-&gt;next;
+cur-&gt;next-&gt;prev = cur-&gt;prev;</code></pre>
+The same idea makes inserting before or after a known node <code>O(1)</code> as well.
+<br><br>
+<b>Trade-off:</b> doubly linked lists need more memory and more pointer updates.
+</div>
+
+<div class="card">
+<div class="tag">Info2::Abstract_Data_Types</div>
+<div class="question"><b>Stack</b> — What is the stack principle? How does a stack work? Name 5 operations you can do with a stack.</div>
+<b>Principle:</b> <b>LIFO</b> = <b>L</b>ast <b>I</b>n, <b>F</b>irst <b>O</b>ut.<br>
+The most recently inserted element is the first one removed.
+<br><br>
+<b>How it works:</b>
+<ul>
+<li>Insertion happens only at the <b>top</b>.</li>
+<li>Removal also happens only at the <b>top</b>.</li>
+<li>You never insert or remove in the middle.</li>
+</ul>
+<b>Five common operations:</b>
+<ol>
+<li><b>create / init</b> — make an empty stack</li>
+<li><b>push(x)</b> — put <code>x</code> on top</li>
+<li><b>pop()</b> — remove the top element</li>
+<li><b>top() / peek()</b> — read the top element without removing it</li>
+<li><b>isEmpty()</b> — check whether the stack is empty</li>
+</ol>
+</div>
+
+<div class="card">
+<div class="tag">Info2::Abstract_Data_Types</div>
+<div class="question"><b>Stack</b> — Why do we often work with pointers or a sentinel first dummy element in C when implementing a stack?</div>
+<b>Main reason:</b> in C, function arguments are passed <b>by value</b>.<br>
+So if the stack is represented by a pointer to the first node and you pass only that pointer into a function, the function receives a <b>copy</b> of the pointer.
+<br><br>
+Example:
+<pre><code>void push(Node *top, int x) {
+    // changing top here changes only the local copy
+}</code></pre>
+If <code>push</code> needs to make a new first node, then the caller's top pointer must change too. Therefore you usually use either:
+<ul>
+<li><b>a pointer to the pointer</b>, e.g. <code>Node **top</code></li>
+<li><b>or a stack struct / sentinel node</b> whose address stays fixed</li>
+</ul>
+<b>Why a sentinel helps:</b><br>
+A sentinel (dummy first node) gives you a stable object whose address never changes. The actual first real element is stored in <code>sentinel-&gt;next</code>. Then functions can modify <code>sentinel-&gt;next</code> without having to replace the sentinel itself.
+<br><br>
+<b>Summary:</b>
+<ul>
+<li>Need to change the top pointer itself? Use <code>Node **top</code>.</li>
+<li>Want a fixed front object? Use a sentinel / wrapper struct.</li>
+</ul>
+</div>
+
+<div class="card">
+<div class="tag">Info2::Abstract_Data_Types</div>
+<div class="question"><b>Stack</b> — How do I create a stack, and how do I push and pop an element in C?</div>
+<pre><code>#include &lt;stdlib.h&gt;
+
+typedef struct node {
+    int value;
+    struct node *next;
+} Node;
+
+// create an empty stack
+Node *create_stack(void) {
+    return NULL;
+}
+
+void push(Node **top, int x) {
+    Node *new_node = malloc(sizeof(Node));
+
+    // new node becomes the new top
+    new_node-&gt;value = x;
+    new_node-&gt;next = *top;
+    *top = new_node;
+}
+
+int pop(Node **top) {
+    // caller should ensure the stack is not empty
+    Node *tmp = *top;
+    int x = tmp-&gt;value;
+
+    // remove the top node
+    *top = tmp-&gt;next;
+    free(tmp);
+
+    return x;
+}</code></pre>
+<b>Usage:</b>
+<pre><code>Node *S = create_stack();
+push(&amp;S, 10);
+push(&amp;S, 20);
+int x = pop(&amp;S);   // x = 20</code></pre>
+<b>Why this works:</b> both <code>push</code> and <code>pop</code> may change the top pointer, so they receive <code>Node **top</code>.
+</div>
+
+<div class="card">
+<div class="tag">Info2::Abstract_Data_Types</div>
+<div class="question"><b>Queue</b> — What is the queue principle? What happens at the head and the tail? Explain circular indexing.</div>
+<b>Principle:</b> <b>FIFO</b> = <b>F</b>irst <b>I</b>n, <b>F</b>irst <b>O</b>ut.<br>
+The oldest inserted element is removed first.
+<br><br>
+<b>Head vs. tail:</b>
+<ul>
+<li><b>enqueue</b> inserts at the <b>tail</b></li>
+<li><b>dequeue</b> removes from the <b>head</b></li>
+</ul>
+<b>Circular indexing:</b><br>
+In an array-based queue, after reaching the last array position you do not stop. You wrap around to index <code>0</code>.
+<pre><code>next_index = (current_index + 1) % capacity</code></pre>
+This makes the array behave like a circle.
+<br><br>
+Example with capacity 5:
+<pre><code>0 1 2 3 4
+        ^ tail
+
+tail = (4 + 1) % 5 = 0</code></pre>
+So after index 4, the next free position is again index 0.
+<br><br>
+<b>Why useful?</b><br>
+It avoids shifting all elements after each dequeue. Head and tail simply move around the ring.
+</div>
+
+<div class="card">
+<div class="tag">Info2::Abstract_Data_Types</div>
+<div class="question"><b>Queue</b> — What is the structure of a queue in C? Write <code>enqueue</code> and <code>dequeue</code> in C.</div>
+<pre><code>#define CAPACITY 100
+
+typedef struct {
+    int a[CAPACITY];
+    int head;   // index of the first element
+    int tail;   // index where the next inserted element goes
+    int size;   // current number of stored elements
+} Queue;
+
+void initQueue(Queue *q) {
+    q-&gt;head = 0;
+    q-&gt;tail = 0;
+    q-&gt;size = 0;
+}
+
+void enqueue(Queue *q, int x) {
+    // assume the queue is not full
+    q-&gt;a[q-&gt;tail] = x;                  // insert at tail
+    q-&gt;tail = (q-&gt;tail + 1) % CAPACITY; // move tail circularly
+    q-&gt;size++;
+}
+
+int dequeue(Queue *q) {
+    // assume the queue is not empty
+    int x = q-&gt;a[q-&gt;head];              // remove from head
+    q-&gt;head = (q-&gt;head + 1) % CAPACITY; // move head circularly
+    q-&gt;size--;
+    return x;
+}</code></pre>
+<b>Why store <code>size</code>?</b><br>
+It makes checking empty/full easier:
+<ul>
+<li>empty iff <code>size == 0</code></li>
+<li>full iff <code>size == CAPACITY</code></li>
+</ul>
+</div>
+
+<div class="card">
+<div class="tag">Info2::Abstract_Data_Types</div>
+<div class="question"><b>Ordered List</b> — What is the difference between <code>struct node *</code> and <code>struct node **</code>? What does this allow?</div>
+<ul>
+<li><code>struct node *</code> = a pointer to one node</li>
+<li><code>struct node **</code> = a pointer to a pointer to a node</li>
+</ul>
+<b>Meaning:</b>
+<ul>
+<li>If a function gets <code>struct node *p</code>, it can access and modify the node that <code>p</code> points to.</li>
+<li>If a function gets <code>struct node **p</code>, it can also modify the pointer itself.</li>
+</ul>
+<b>What does that allow?</b><br>
+It lets a function change the head of a list.
+That is exactly what you need when:
+<ul>
+<li>initializing an empty list</li>
+<li>inserting a new smallest element at the front</li>
+<li>deleting the first element</li>
+</ul>
+<b>Example:</b>
+<pre><code>void insert_front(struct node **head, int x) {
+    // this function can change *head itself
+}</code></pre>
+</div>
+
+<div class="card">
+<div class="tag">Info2::Abstract_Data_Types</div>
+<div class="question"><b>Ordered List</b> — C coding: initialize an ordered list in C with <code>struct node ** init()</code>.</div>
+<pre><code>#include &lt;stdlib.h&gt;
+
+struct node {
+    int value;
+    struct node *next;
+};
+
+struct node **init(void) {
+    // allocate memory for the head pointer itself
+    struct node **L = malloc(sizeof(struct node *));
+
+    // initially the list is empty
+    *L = NULL;
+
+    return L;
+}</code></pre>
+<b>Why return <code>struct node **</code>?</b><br>
+Because the ordered-list ADT stores a modifiable head pointer. Functions working on the ADT can then change <code>*L</code>, i.e. the first real node of the list.
+</div>
+
+<div class="card">
+<div class="tag">Info2::Abstract_Data_Types</div>
+<div class="question"><b>Ordered List</b> — How do you retrieve the first element of an ordered list?</div>
+<pre><code>struct node {
+    int value;
+    struct node *next;
+};
+
+int first(struct node **L) {
+    // assume the list is not empty
+    return (*L)-&gt;value;
+}</code></pre>
+<b>Why is this correct?</b><br>
+In an ordered list, the first node stores the smallest element if the order is ascending.<br>
+If the list may be empty, you first need a check:
+<pre><code>if (*L == NULL) { /* error / special value */ }</code></pre>
+</div>
+
+<div class="card">
+<div class="tag">Info2::Abstract_Data_Types</div>
+<div class="question"><b>Ordered List</b> — How do you insert a value iteratively into an ordered list?</div>
+<pre><code>#include &lt;stdlib.h&gt;
+
+struct node {
+    int value;
+    struct node *next;
+};
+
+void insert_ordered(struct node **L, int x) {
+    struct node *new_node = malloc(sizeof(struct node));
+    new_node-&gt;value = x;
+    new_node-&gt;next = NULL;
+
+    // special case: empty list or x belongs before the first element
+    if (*L == NULL || x &lt; (*L)-&gt;value) {
+        new_node-&gt;next = *L;
+        *L = new_node;
+        return;
+    }
+
+    // walk until cur points to the node after which x should be inserted
+    struct node *cur = *L;
+    while (cur-&gt;next != NULL &amp;&amp; cur-&gt;next-&gt;value &lt; x) {
+        cur = cur-&gt;next;
+    }
+
+    // insert new_node between cur and cur->next
+    new_node-&gt;next = cur-&gt;next;
+    cur-&gt;next = new_node;
+}</code></pre>
+<b>Idea:</b> move forward until you find the first place where the next value is not smaller than <code>x</code>, then splice the new node into that gap.<br>
+<b>Complexity:</b> <code>O(n)</code>.
+</div>
+
+</body>
+</html>
