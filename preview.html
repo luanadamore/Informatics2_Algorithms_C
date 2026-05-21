@@ -56,7 +56,7 @@
 </head>
 <body>
 
-<h1>Info2 Flashcards — Preview</h1>
+<h1>Info2 Flashcards ? Preview</h1>
 <p class="hint">This file shows exactly how each card will look in Anki. Open it in any browser (double-click the file). Refresh after every change.</p>
 
 <!-- ===================== SORTING ===================== -->
@@ -227,7 +227,7 @@ void quick_sort(int a[], int lo, int hi) {
 <b>Ideal pivot:</b> the <i>median</i> of the sub-array → both partitions have size ≈ n/2 → recursion depth ≈ log n → total <b>O(n log n)</b>.
 But finding the true median costs an extra O(n) per call → too expensive in practice.
 
-<p><b>Three practical pivot strategies:</b></p>
+<b>Three practical pivot strategies:</b>
 <ol>
 <li><b>Random pivot</b> — pick a uniformly random index in <code>[lo, hi]</code>. Defeats adversarial inputs (sorted / reverse-sorted arrays). Expected <b>O(n log n)</b>, worst case still possible but extremely unlikely.</li>
 <li><b>Median-of-three</b> — take the median of <code>a[lo]</code>, <code>a[mid]</code>, <code>a[hi]</code>. Cheap (3 comparisons), usually much closer to the true median than any single element. This is what most real-world implementations use.</li>
@@ -371,127 +371,6 @@ void merge_sort(int a[], int lo, int hi) {
 <li>Time — Best / Average / Worst: <b>O(n log n)</b> (recurrence T(n) = 2·T(n/2) + Θ(n)).</li>
 <li>Space: <b>O(n)</b> extra for the merge buffers + O(log n) recursion stack. <b>Not</b> in-place.</li>
 </ul>
-</div>
-
-<div class="card">
-<div class="tag">Info2::Sorting</div>
-<div class="question"><b>Dual-Pivot Quicksort</b> — In a dual-pivot quicksort implementation, an array <code>A[low...high]</code> is sorted based on two pivots <code>p1 = A[low]</code> and <code>p2 = A[high]</code>. The pivot <code>p1</code> must be less than <code>p2</code>, otherwise they have to be swapped. Here <code>low</code> is the left end of the array <code>A</code> and <code>high</code> is the right end of the array <code>A</code>.<br><br>
-The partitioning process is the core of the dual-pivot quicksort. We begin partitioning the array into three proper partitions I, II and III, where:
-<ul>
-<li>Partition I: all elements are less than the left pivot <code>p1</code>.</li>
-<li>Partition II: all elements are greater or equal to <code>p1</code> and less than the right pivot <code>p2</code>.</li>
-<li>Partition III: all elements are greater than or equal to the right pivot <code>p2</code>.</li>
-</ul>
-After partitioning, the two pivots are placed in their proper final positions and the process is repeated recursively on each of the three partitions.<br><br>
-Create a C program that implements dual-pivot quicksort to sort an array <code>A</code> of integers in increasing order. Your program should also print the array before and after sorting. For example, if the array is <code>[10, 7, 3, 15, 6, 2, 5, 1, 17, 8]</code>, the output should contain:
-<pre><code>Before: [ 10 7 3 15 6 2 5 1 17 8 ]
-After:  [ 1 2 3 5 6 7 8 10 15 17 ]</code></pre></div>
-<b>Quick explanation in words:</b>
-<ul>
-<li>Choose two pivots: the leftmost and the rightmost element.</li>
-<li>If they are in the wrong order, swap them so <code>p1 &lt;= p2</code>.</li>
-<li>Then scan the array once and split it into three regions: smaller than <code>p1</code>, between the pivots, and greater or equal to <code>p2</code>.</li>
-<li>Finally, put both pivots into their final places and recursively sort the three remaining parts.</li>
-</ul>
-<b>C code:</b>
-<pre><code>#include &lt;stdio.h&gt;
-
-#define ARRAY_SIZE 10
-
-void swap(int A[], int i, int j) {
-    // swap the two elements at indices i and j
-    int tmp = A[i];
-    A[i] = A[j];
-    A[j] = tmp;
-}
-
-void printArray(int a[], int size) {
-    // print the array in the required format: [ 1 2 3 ]
-    printf("[");
-    for (int i = 0; i &lt; size; i++) {
-        printf(" %d", a[i]);
-    }
-    printf(" ]\\n");
-}
-
-void partitioning(int A[], int low, int high, int *p1, int *p2) {
-    // A[low] is the left pivot, A[high] is the right pivot
-    // l = first free position in partition I  (< p1)
-    // k = current scanning index
-    // g = first position of partition III (>= p2) from the right
-    int l = low + 1;
-    int k = low + 1;
-    int g = high;
-
-    // scan the array once and move each element into its correct partition
-    while (k &lt; g) {
-        // belongs to partition I: move it to the left side
-        if (A[k] &lt; A[low]) {
-            swap(A, l, k);
-            l++;
-            k++;
-        }
-        // belongs to partition III: move it to the right side
-        else if (A[k] &gt;= A[high]) {
-            g--;
-            swap(A, k, g);
-            // do NOT increment k here:
-            // the element swapped in from the right has not been inspected yet
-        }
-        // otherwise it belongs to partition II and stays in the middle
-        else {
-            k++;
-        }
-
-        // prints intermediate partitioning steps
-        printArray(A, ARRAY_SIZE);
-    }
-
-    // place the pivots into their final positions
-    swap(A, low, l - 1);
-    swap(A, high, k);
-
-    // return the pivot positions through pointers
-    *p1 = l - 1;
-    *p2 = k;
-}
-
-void quicksort(int A[], int low, int high) {
-    // base case: empty part or single element => already sorted
-    if (high - low &lt;= 0) {
-        return;
-    }
-
-    // ensure the left pivot is not larger than the right pivot
-    if (A[low] &gt; A[high]) {
-        swap(A, low, high);
-    }
-
-    int p1, p2;
-
-    // partition the current subarray around the two pivots
-    partitioning(A, low, high, &p1, &p2);
-
-    // recursively sort the three partitions
-    quicksort(A, low, p1 - 1);
-    quicksort(A, p1 + 1, p2 - 1);
-    quicksort(A, p2 + 1, high);
-}
-
-int main() {
-    int A[] = {10, 7, 3, 15, 6, 2, 5, 1, 17, 8};
-    int n = 10;
-
-    printf("Before: ");
-    printArray(A, n);
-
-    quicksort(A, 0, n - 1);
-
-    printf("After:  ");
-    printArray(A, n);
-
-    return 0;
-}</code></pre>
 </div>
 
 <!-- ===================== COMPLEXITY AND CORRECTNESS ===================== -->
@@ -1244,58 +1123,6 @@ int *p = &amp;x;
 
 <div class="card">
 <div class="tag">Info2::Abstract_Data_Types</div>
-<div class="question"><b>Pointers</b> — How do double pointers work? Explain <code>int **p</code>, <code>**p</code>, and why double pointers are useful in code. In particular, explain the case where a tree node itself may change.</div>
-<b>Core idea:</b><br>
-A <b>double pointer</b> stores the address of a pointer.
-<pre><code>int x = 20;
-int *q = &amp;x;    // q points to x
-int **p = &amp;q;   // p points to q</code></pre>
-Then:
-<ul>
-<li><code>q</code> is an address of an <code>int</code>.</li>
-<li><code>*q</code> is the integer value stored there.</li>
-<li><code>p</code> is an address of a pointer.</li>
-<li><code>*p</code> is the pointer <code>q</code>.</li>
-<li><code>**p</code> is the integer value behind <code>q</code>, so here <code>**p = 20</code>.</li>
-</ul>
-<b>Small example:</b>
-<pre><code>int x = 20;
-int *q = &amp;x;
-int **p = &amp;q;
-
-printf("%d\\n", **p);   // 20
-**p = 99;               // changes x through two dereferences</code></pre>
-<b>Why useful?</b>
-<ul>
-<li>Whenever a function must be able to change a pointer owned by the caller.</li>
-<li>Typical cases: inserting into a linked list, changing the root of a tree, allocating memory and storing the new pointer back.</li>
-</ul>
-<b>Tree example:</b><br>
-Suppose a tree is represented by a pointer to its root:
-<pre><code>struct node {
-    int key;
-    struct node *left, *right;
-};</code></pre>
-If a function may need to create the root node when the tree is empty, then it must be able to change the caller's root pointer itself:
-<pre><code>void insert_root_if_empty(struct node **root, int x) {
-    if (*root == NULL) {
-        *root = malloc(sizeof(struct node));
-        (*root)-&gt;key = x;
-        (*root)-&gt;left = NULL;
-        (*root)-&gt;right = NULL;
-    }
-}</code></pre>
-Why <code>struct node **root</code>? Because:
-<ul>
-<li><code>root</code> = address of the caller's root pointer</li>
-<li><code>*root</code> = the actual root pointer</li>
-<li><code>**root</code> would be the actual node data if you dereference further</li>
-</ul>
-If you passed only <code>struct node *root</code>, the function would receive a copy of the pointer and could not replace the caller's root.
-</div>
-
-<div class="card">
-<div class="tag">Info2::Abstract_Data_Types</div>
 <div class="question"><b>Linked List</b> — What is the structure of a singly linked list in C, and how do you access one specific value?</div>
 <b>Structure:</b>
 <pre><code>struct node {
@@ -1739,6 +1566,232 @@ It makes checking empty/full easier:
 
 <div class="card">
 <div class="tag">Info2::Abstract_Data_Types</div>
+<div class="question"><b>Queue/Stack Exercise — reverseEven</b> — Provide pseudocode for <code>reverseEven(Q)</code>, which reverses the order of the even integers in a queue while keeping the odd integers in their original positions. Only use the Queue and Stack ADT operations. Analyze the complexity for arbitrary values, all even values, and all odd values.</div>
+<b>Goal:</b><br>
+Given:
+<pre><code>Q = [14, 17, 16, 18, 21, 7, 28, 40]</code></pre>
+we want:
+<pre><code>Q = [40, 17, 28, 18, 21, 7, 16, 14]</code></pre>
+Only the even values are reversed. The odd values stay at the same positions.
+<br><br>
+<b>Idea:</b>
+<ol>
+<li>First scan the queue once. Every even value is pushed onto a stack. Since a stack is LIFO, popping later gives the even values in reverse order.</li>
+<li>During that first scan, enqueue every value again, so the queue returns to its original order.</li>
+<li>Second scan: if the current queue value is even, discard it and enqueue the next value from the stack. If it is odd, enqueue it unchanged.</li>
+</ol>
+<b>Pseudocode:</b>
+<pre><code>Algorithm reverseEven(Q)
+    // S will store all even values temporarily.
+    // Because S is a stack, the last even value pushed will be popped first.
+    S = initStack()
+
+    // Store the original queue length.
+    // Important: we must loop exactly n times, because Q is modified during the loop.
+    n = queueSize(Q)
+
+    // ----- first pass: collect even values -----
+    // After this pass, Q has the same order as before,
+    // and S contains all even values in encounter order.
+    for i = 1 to n do
+        // Remove the front element so we can inspect it.
+        val = deQueue(Q)
+
+        // Check whether val is even.
+        // Even values are exactly the values whose order must be reversed.
+        if val % 2 == 0 then
+            // Push the even value onto S.
+            // Later, pop(S) will return the even values in reverse order.
+            push(S, val)
+
+        // Put val back at the rear of Q.
+        // After n such rotations, Q is back in its original order.
+        enQueue(Q, val)
+
+    // ----- second pass: rebuild Q -----
+    // We again process each original position exactly once.
+    for i = 1 to n do
+        // Remove the current front value.
+        // This tells us whether the current position was even or odd.
+        val = deQueue(Q)
+
+        // If this position originally contained an even value,
+        // replace it with the next reversed even value.
+        if val % 2 == 0 then
+            // pop(S) gives the even values from last to first.
+            enQueue(Q, pop(S))
+        else
+            // Odd values must stay at the same positions,
+            // so we enqueue the same odd value again.
+            enQueue(Q, val)</code></pre>
+<b>Complexity:</b><br>
+Let <code>n = queueSize(Q)</code> and let <code>e</code> be the number of even values.
+<ul>
+<li>Queue operations: first pass has <code>n</code> dequeues and <code>n</code> enqueues; second pass also has <code>n</code> dequeues and <code>n</code> enqueues.</li>
+<li>Stack operations: each even value is pushed once and popped once, so <code>2e</code> stack operations.</li>
+<li>Total primitive ADT operations: <code>4n + 2e</code>.</li>
+</ul>
+Because <code>0 ≤ e ≤ n</code>, the runtime is always <b><code>O(n)</code></b>.
+<br><br>
+<b>Cases:</b>
+<ul>
+<li><b>No assumption:</b> worst case <code>e = n</code> → <code>4n + 2n = 6n</code> operations → <code>O(n)</code>.</li>
+<li><b>All values even:</b> <code>e = n</code> → <code>O(6n) = O(n)</code>.</li>
+<li><b>All values odd:</b> <code>e = 0</code> → <code>O(4n) = O(n)</code>.</li>
+</ul>
+<b>Space:</b> <code>O(e)</code>, worst case <code>O(n)</code>, for the stack of even values.
+</div>
+
+<div class="card">
+<div class="tag">Info2::Abstract_Data_Types</div>
+<div class="question"><b>Stack Exercise — sortStack</b> — Provide pseudocode for <code>sortStack(S)</code>, which sorts a stack of integers in ascending order so that the smallest integer is at the top. Only use the Stack ADT operations <code>initStack</code>, <code>push</code>, <code>pop</code>, and <code>isEmpty</code>.</div>
+<b>Idea:</b><br>
+We repeatedly find the maximum remaining value and push it back onto <code>S</code>.
+<br><br>
+This sounds backwards, but it gives the correct final stack:
+<ul>
+<li>First, the largest value is pushed onto empty <code>S</code>.</li>
+<li>Then the second-largest is pushed on top of it.</li>
+<li>At the end, the smallest value is pushed last, so it is on top.</li>
+</ul>
+<b>Auxiliary stacks:</b>
+<ul>
+<li><code>a</code>: holds the values that are not yet sorted.</li>
+<li><code>b</code>: temporary stack for values that are not the current maximum.</li>
+<li><code>S</code>: rebuilt into sorted order.</li>
+</ul>
+<b>Pseudocode:</b>
+<pre><code>Algorithm sortStack(S)
+    // a stores the values that are still unsorted.
+    a = initStack()
+
+    // b is a temporary stack used while searching for the maximum.
+    b = initStack()
+
+    // Move all values from S into a.
+    // This empties S so we can rebuild it in sorted order.
+    while not isEmpty(S) do
+        // pop(S) removes the current top of S.
+        // push(a, ...) stores it in the unsorted auxiliary stack.
+        push(a, pop(S))
+
+    // Each outer-loop iteration chooses one maximum from a.
+    // That maximum is then pushed onto S.
+    while not isEmpty(a) do
+        // Start by assuming the first popped value is the maximum.
+        maxV = pop(a)
+
+        // Scan all other unsorted values in a.
+        while not isEmpty(a) do
+            // Take one candidate value from a.
+            tmpV = pop(a)
+
+            // If tmpV is larger, it becomes the new maximum.
+            if tmpV &gt; maxV then
+                // The old maxV is not the maximum anymore,
+                // so keep it in b for a later round.
+                push(b, maxV)
+
+                // tmpV is now the best maximum found so far.
+                maxV = tmpV
+            else
+                // tmpV is not the maximum of this round,
+                // so keep it in b for a later round.
+                push(b, tmpV)
+
+        // maxV is the largest remaining value.
+        // Push it onto S as the next sorted value.
+        push(S, maxV)
+
+        // Now b contains all values except maxV.
+        // Swap a and b so the next round scans those remaining values.
+        c = a
+        a = b
+        b = c</code></pre>
+<b>Correctness intuition:</b><br>
+Every round removes the largest remaining value and pushes it onto <code>S</code>. Since larger values are pushed earlier and smaller values later, the smallest value ends up at the top.
+<br><br>
+<b>Complexity:</b>
+<ul>
+<li>First round scans <code>n</code> values, next round <code>n-1</code>, then <code>n-2</code>, ...</li>
+<li>Total time: <code>O(n + (n-1) + ... + 1) = O(n²)</code>.</li>
+<li>Extra space: <code>O(n)</code> for the auxiliary stacks.</li>
+</ul>
+</div>
+
+<div class="card">
+<div class="tag">Info2::Abstract_Data_Types</div>
+<div class="question"><b>Stack Exercise — kth Largest</b> — A stack <code>S</code> contains <code>n</code> unique integers. Provide pseudocode for <code>Kth(S, n, k)</code> that returns the <code>k</code>-th largest value. You may change <code>S</code> and use one auxiliary stack, but no other composite data structure.</div>
+<b>Idea:</b><br>
+Find and remove the maximum value <code>k</code> times.
+<ul>
+<li>After the first scan, the largest value is removed.</li>
+<li>After the second scan, the second-largest value is removed.</li>
+<li>After the <code>k</code>-th scan, the removed value is the <code>k</code>-th largest.</li>
+</ul>
+Because all values are unique, we can safely remove the found maximum by checking <code>top != x</code>.
+<br><br>
+<b>Variables:</b>
+<ul>
+<li><code>S</code>: input stack, changed by the algorithm.</li>
+<li><code>T</code>: auxiliary stack used to temporarily hold values during a scan.</li>
+<li><code>x</code>: maximum value found in the current round.</li>
+<li><code>top</code>: value just popped from a stack.</li>
+</ul>
+<b>Pseudocode:</b>
+<pre><code>Algorithm Kth(S, n, k)
+    // T is the only auxiliary stack.
+    // It temporarily stores values while we scan S.
+    T = initStack()
+
+    // Repeat k times.
+    // Round 1 removes the largest, round 2 the second-largest, etc.
+    for i = 1 to k do
+        // Pop one value to initialize the current maximum candidate.
+        top = pop(S)
+
+        // Store it in T so it is not lost.
+        push(T, top)
+
+        // x is the largest value found in this round so far.
+        x = top
+
+        // Scan all remaining values in S.
+        while not isEmpty(S) do
+            // Remove one value from S.
+            top = pop(S)
+
+            // Save it in T while we continue scanning.
+            push(T, top)
+
+            // Update x if this value is larger.
+            if top &gt; x then
+                x = top
+
+        // Move all values back to S except x.
+        // This deletes the current maximum from S permanently.
+        while not isEmpty(T) do
+            // Get one saved value back from T.
+            top = pop(T)
+
+            // Since all values are unique, only the found maximum equals x.
+            if top != x then
+                // Keep every value that is not the current maximum.
+                push(S, top)
+
+    // After k rounds, x is the value removed in round k,
+    // therefore it is the kth largest value.
+    return x</code></pre>
+<b>Complexity:</b>
+<ul>
+<li>Round 1 scans <code>n</code> values, round 2 scans <code>n-1</code>, ..., round <code>k</code> scans about <code>n-k+1</code> values.</li>
+<li>Time: <code>O(kn)</code>; worst case <code>k = n</code> gives <code>O(n²)</code>.</li>
+<li>Extra space: <code>O(n)</code> for the auxiliary stack.</li>
+</ul>
+</div>
+
+<div class="card">
+<div class="tag">Info2::Abstract_Data_Types</div>
 <div class="question"><b>Ordered List</b> — What is the difference between <code>struct node *</code> and <code>struct node **</code>? What does this allow?</div>
 <ul>
 <li><code>struct node *</code> = a pointer to one node</li>
@@ -1860,7 +1913,7 @@ void insert_ordered(struct node **L, int x) {
 </ul>
 <b>Min-heap vs BST — key differences:</b>
 <ul>
-<li>In a min-heap, only the <b>root</b> is guaranteed to be the global minimum. There is <b>no order between siblings</b>, and the left subtree is <b>not</b> "all smaller" than the right.</li>
+<li>In a min-heap, only the <b>root</b> is guaranteed to be the global minimum. There is <b>no order between siblings</b>, and the left subtree is <b>not</b> &quot;all smaller&quot; than the right.</li>
 <li>In a BST, in-order traversal gives the values in <b>sorted order</b>. In a heap, no traversal yields sorted order.</li>
 <li>Use heaps for <b>priority queues</b> (fast min/max + insert).</li>
 <li>Use BSTs for <b>ordered search</b>, range queries, sorted iteration.</li>
@@ -1872,8 +1925,8 @@ void insert_ordered(struct node **L, int x) {
 <div class="question"><b>BST</b> — What are the complexities of search, insert, and delete in a BST? (average and worst case)</div>
 All three operations walk <b>one path</b> from the root downward, so they cost <b>O(h)</b> where <code>h</code> is the height of the tree.
 <br><br>
-<table style="border-collapse: collapse;">
-<tr><th style="text-align:left; padding-right:18px;">Operation</th><th style="text-align:left; padding-right:18px;">Average</th><th style="text-align:left;">Worst</th></tr>
+<table style=&quot;border-collapse: collapse;&quot;>
+<tr><th style=&quot;text-align:left; padding-right:18px;&quot;>Operation</th><th style=&quot;text-align:left; padding-right:18px;&quot;>Average</th><th style=&quot;text-align:left;&quot;>Worst</th></tr>
 <tr><td>search</td><td><b>O(log n)</b></td><td><b>O(n)</b></td></tr>
 <tr><td>insert</td><td><b>O(log n)</b></td><td><b>O(n)</b></td></tr>
 <tr><td>delete</td><td><b>O(log n)</b></td><td><b>O(n)</b></td></tr>
@@ -1906,13 +1959,13 @@ For each traversal you do something at the node (<b>N</b>) and visit the left (<
 void inorder(struct node *root) {
     if (root == NULL) return;
     inorder(root-&gt;left);
-    printf("%d ", root-&gt;value);
+    printf(&quot;%d &quot;, root-&gt;value);
     inorder(root-&gt;right);
 }
 
 void preorder(struct node *root) {
     if (root == NULL) return;
-    printf("%d ", root-&gt;value);
+    printf(&quot;%d &quot;, root-&gt;value);
     preorder(root-&gt;left);
     preorder(root-&gt;right);
 }
@@ -1921,7 +1974,7 @@ void postorder(struct node *root) {
     if (root == NULL) return;
     postorder(root-&gt;left);
     postorder(root-&gt;right);
-    printf("%d ", root-&gt;value);
+    printf(&quot;%d &quot;, root-&gt;value);
 }</code></pre>
 <b>Complexity:</b> <code>O(n)</code> for all three (every node is visited once).
 </div>
@@ -1939,7 +1992,133 @@ By the BST property:
 </ul>
 Inorder visits L → N → R, so it prints all smaller values first, then the node, then all larger values. Applied recursively, this gives <b>ascending order</b>.
 <br><br>
-<b>For descending order:</b> do a "reverse inorder" → R, N, L.
+<b>For descending order:</b> do a &quot;reverse inorder&quot; → R, N, L.
+</div>
+
+<div class="card">
+<div class="tag">Info2::Binary_Trees_BST</div>
+<div class="question"><b>BST Exam Exercise — Print Two BSTs Sorted</b> — Given two BSTs <code>T1</code> and <code>T2</code> with roots <code>r1</code> and <code>r2</code>, print all elements of both trees in ascending order. You may use one array large enough to hold all <code>n + m</code> elements, but no sorting algorithm.</div>
+<b>Idea:</b><br>
+For a BST, <b>inorder traversal</b> visits values in ascending order. So:
+<ol>
+<li>Write all values of <code>T1</code> into the array from left to right using inorder.</li>
+<li>Write all values of <code>T2</code> into the array after that, also using inorder.</li>
+<li>Now the array contains two sorted blocks. To print all values sorted overall, merge the two sorted blocks like in merge sort.</li>
+</ol>
+This uses the BST order property instead of a separate sorting algorithm.
+<br><br>
+<b>Tree node:</b>
+<pre><code>struct TreeNode {
+    int val;
+    struct TreeNode *left;
+    struct TreeNode *right;
+};</code></pre>
+<b>Inorder tree walk with position index:</b>
+<pre><code>int a[N];   // large enough for n + m elements
+int idx;    // next free position in a
+
+void ITW(struct TreeNode *p) {
+    // If p is NULL, the current subtree is empty.
+    // Empty subtrees contribute no values to the array.
+    if (p != NULL) {
+        // First visit the left subtree.
+        // In a BST, all values there are smaller than p-&gt;val.
+        ITW(p-&gt;left);
+
+        // Store the current node value at the next free array position.
+        a[idx] = p-&gt;val;
+
+        // Move idx to the next free array position.
+        idx++;
+
+        // Finally visit the right subtree.
+        // In a BST, all values there are larger than p-&gt;val.
+        ITW(p-&gt;right);
+    }
+}</code></pre>
+<b>Full printing idea:</b>
+<pre><code>void printTwoBSTsSorted(struct TreeNode *r1, int n,
+                        struct TreeNode *r2, int m) {
+    // Assume a is the global/helper array from above,
+    // with enough space for all elements from both trees.
+    // The first n slots will hold T1, the next m slots will hold T2.
+
+    // Start writing T1 at index 0.
+    idx = 0;
+
+    // Inorder traversal writes T1 into a[0..n-1] in sorted order.
+    ITW(r1);
+
+    // Start writing T2 right after the block for T1.
+    idx = n;
+
+    // Inorder traversal writes T2 into a[n..n+m-1] in sorted order.
+    ITW(r2);
+
+    // i scans the first sorted block a[0..n-1].
+    int i = 0;
+
+    // j scans the second sorted block a[n..n+m-1].
+    int j = n;
+
+    // While both blocks still contain values,
+    // print the smaller current value and advance that block's cursor.
+    while (i &lt; n &amp;&amp; j &lt; n + m) {
+        if (a[i] &lt;= a[j]) {
+            // a[i] is the next smallest remaining value.
+            print(a[i]);
+
+            // Move to the next value in the first block.
+            i++;
+        } else {
+            // a[j] is the next smallest remaining value.
+            print(a[j]);
+
+            // Move to the next value in the second block.
+            j++;
+        }
+    }
+
+    // If T2 is exhausted first, print the remaining values of T1.
+    while (i &lt; n) {
+        print(a[i]);
+        i++;
+    }
+
+    // If T1 is exhausted first, print the remaining values of T2.
+    while (j &lt; n + m) {
+        print(a[j]);
+        j++;
+    }
+}</code></pre>
+<b>Alternative matching the lecture idea:</b><br>
+If you only need to show how values are inserted into an array during traversal, use an inorder tree walk with an index and direction:
+<pre><code>void ITW(struct TreeNode *p, int d) {
+    // Only process non-empty subtrees.
+    if (p != NULL) {
+        // Visit all smaller values first.
+        ITW(p-&gt;left, d);
+
+        // Store the current node at the current array position.
+        a[idx] = p-&gt;val;
+
+        // Move the array position by d.
+        // For normal left-to-right writing, d = 1.
+        idx = idx + d;
+
+        // Visit all larger values last.
+        ITW(p-&gt;right, d);
+    }
+}</code></pre>
+Here <code>d = 1</code> writes left-to-right. A direction value is useful when you want the same traversal routine to fill different parts of the array.
+<br><br>
+<b>Complexity:</b>
+<ul>
+<li>Each tree node is visited once: <code>O(n + m)</code>.</li>
+<li>The merge pass is also <code>O(n + m)</code>.</li>
+<li>Total time: <code>O(n + m)</code>.</li>
+<li>Extra space: <code>O(n + m)</code> for the array.</li>
+</ul>
 </div>
 
 <div class="card">
@@ -2228,7 +2407,7 @@ void bst_delete(struct node **p, int x) {
         struct node *tmp = bst_min((*p)-&gt;right);
 
         // copy ONLY the VALUE of the successor into the current node.
-        // the structural node we want to remove is now "tmp" but its
+        // the structural node we want to remove is now &quot;tmp&quot; but its
         // value already lives here, so the BST still looks correct.
         (*p)-&gt;value = tmp-&gt;value;
 
@@ -2311,8 +2490,8 @@ int height(struct node *root) {
 <li>Finding strongly connected components (Tarjan, Kosaraju).</li>
 </ul>
 <b>Quick comparison:</b>
-<table style="border-collapse: collapse;">
-<tr><th style="text-align:left; padding-right:18px;"></th><th style="text-align:left; padding-right:18px;">BFS</th><th style="text-align:left;">DFS</th></tr>
+<table style=&quot;border-collapse: collapse;&quot;>
+<tr><th style=&quot;text-align:left; padding-right:18px;&quot;></th><th style=&quot;text-align:left; padding-right:18px;&quot;>BFS</th><th style=&quot;text-align:left;&quot;>DFS</th></tr>
 <tr><td>structure</td><td>queue</td><td>stack / recursion</td></tr>
 <tr><td>order</td><td>level by level</td><td>deep first</td></tr>
 <tr><td>shortest path (unweighted)</td><td>YES</td><td>no</td></tr>
@@ -2483,13 +2662,13 @@ int max(int a, int b) {
 <div class="card">
 <div class="tag">Info2::AVL_Trees</div>
 <div class="question"><b>AVL</b> — After an insertion, there are 4 cases that can violate the AVL property. Name them and the fix for each.</div>
-<table style="border-collapse: collapse;">
+<table style=&quot;border-collapse: collapse;&quot;>
 <tr>
-  <th style="text-align:left; padding-right:18px;">Case</th>
-  <th style="text-align:left; padding-right:18px;">Trigger</th>
-  <th style="text-align:left; padding-right:18px;">bf(v)</th>
-  <th style="text-align:left; padding-right:18px;">bf(child)</th>
-  <th style="text-align:left;">Fix</th>
+  <th style=&quot;text-align:left; padding-right:18px;&quot;>Case</th>
+  <th style=&quot;text-align:left; padding-right:18px;&quot;>Trigger</th>
+  <th style=&quot;text-align:left; padding-right:18px;&quot;>bf(v)</th>
+  <th style=&quot;text-align:left; padding-right:18px;&quot;>bf(child)</th>
+  <th style=&quot;text-align:left;&quot;>Fix</th>
 </tr>
 <tr><td><b>LL</b></td><td>insert into <b>L</b>eft subtree of <b>L</b>eft child</td><td>&gt; 1</td><td>≥ 0</td><td><code>right_rotate(v)</code></td></tr>
 <tr><td><b>LR</b></td><td>insert into <b>R</b>ight subtree of <b>L</b>eft child</td><td>&gt; 1</td><td>&lt; 0</td><td><code>left_rotate(v-&gt;left)</code> then <code>right_rotate(v)</code></td></tr>
@@ -2688,8 +2867,8 @@ void AVLDelete(struct node **p, int x) {
 <li>Then all three core operations run in <b>expected O(1)</b>.</li>
 </ul>
 <b>Time complexity:</b>
-<table style="border-collapse: collapse;">
-<tr><th style="text-align:left; padding-right:18px;">Op</th><th style="text-align:left; padding-right:18px;">Average</th><th style="text-align:left;">Worst case</th></tr>
+<table style=&quot;border-collapse: collapse;&quot;>
+<tr><th style=&quot;text-align:left; padding-right:18px;&quot;>Op</th><th style=&quot;text-align:left; padding-right:18px;&quot;>Average</th><th style=&quot;text-align:left;&quot;>Worst case</th></tr>
 <tr><td>search</td><td><b>O(1)</b></td><td><b>O(n)</b></td></tr>
 <tr><td>insert</td><td><b>O(1)</b></td><td><b>O(n)</b></td></tr>
 <tr><td>delete</td><td><b>O(1)</b></td><td><b>O(n)</b></td></tr>
@@ -2706,15 +2885,24 @@ void AVLDelete(struct node **p, int x) {
 #define DEL 2   // deleted — tombstone; search must keep probing past it
 
 struct slot {
-    int key;
-    int value;
+    int key;      // the actual value we want to store (e.g. 18).
+                  // NOT the hash — the hash is computed FROM this key.
+    int value;    // optional payload attached to the key (e.g. a count
+                  // or a related number). Omit this field for a set-only HT.
     int status;   // either OCC, EMP, or DEL
 };
 
 struct hash_table {
-    struct slot *table;   // dynamically allocated array of m slots
+    struct slot *table;   // pointer to a dynamically allocated array of m slots
+                          // (we use a pointer because the size m is decided
+                          //  at runtime, not at compile time)
     int m;                // size of the table (number of slots)
 };</code></pre>
+<b>Note — simpler &quot;set-only&quot; variant from class:</b>
+<pre><code>int table[SIZE];   // each slot just stores an integer key,
+                   // no value, no status (uses e.g. -1 for empty)</code></pre>
+This is more compact but harder to extend (no payload, no DEL state).
+<br><br>
 <b>Why we need 3 statuses (not just OCC / EMP):</b> with open addressing we cannot simply mark a deleted slot as EMP — that would break the probe sequence of other keys (see the deletion card). The <b>DEL</b> tombstone preserves the probe path while marking the slot as reusable for inserts.
 </div>
 
@@ -2725,7 +2913,7 @@ struct hash_table {
 <pre><code>h(k) = k mod m</code></pre>
 <ul>
 <li>Fast and easy.</li>
-<li><b>Good choice for m:</b> a <b>prime</b> that is <b>not close to a power of 2</b> (or a power of 10).</li>
+<li><b>Good choice for m:</b> a <b>prime</b> that is <b>not close to a power of 2</b> (or a power of 10). Typical examples: <b>7, 11, 13, 17, 31</b>, 97, 1009, …</li>
 <li>Why? If <code>m = 2^p</code>, then <code>h(k)</code> = the last <code>p</code> bits of <code>k</code> → the high bits are ignored → terrible distribution.</li>
 </ul>
 <b>2) Multiplication method</b>
@@ -2737,26 +2925,801 @@ where <code>0 &lt; A &lt; 1</code>. Take the fractional part of <code>k · A</co
 </ul>
 </div>
 
+<!-- ===================== DYNAMIC PROGRAMMING ===================== -->
+
+<div class="card">
+<div class="tag">Info2::Dynamic_Programming</div>
+<div class="question"><b>Matrix Multiplication DP</b> — How can we find the best parenthesis split for matrix multiplication with a helper matrix? What values are calculated there? Code the DP solution for the minimum multiplication cost in C, iteratively and recursively. Explain the difference.</div>
+<b>Problem:</b><br>
+Given matrices
+<pre><code>A1, A2, ..., An</code></pre>
+we want to choose the parentheses so that the number of scalar multiplications is minimal.
+<br><br>
+If matrix <code>Ai</code> has size <code>d[i-1] × d[i]</code>, then multiplying
+<pre><code>(Ai ... Ak) · (A(k+1) ... Aj)</code></pre>
+costs:
+<pre><code>M[i][k] + M[k+1][j] + d[i-1] * d[k] * d[j]</code></pre>
+<b>Helper matrix:</b>
+<ul>
+<li><code>M[i][j]</code> stores the <b>minimum cost</b> to multiply matrices <code>Ai ... Aj</code>.</li>
+<li><code>split[i][j]</code> can store the best split position <code>k</code>, so we know where to put the parentheses.</li>
+<li>Base case: <code>M[i][i] = 0</code>, because one matrix alone needs no multiplication.</li>
+</ul>
+<b>Variable meanings:</b>
+<ul>
+<li><code>d[]</code>: dimension array. Matrix <code>Ai</code> has size <code>d[i-1] × d[i]</code>.</li>
+<li><code>n</code>: number of matrices, so <code>d</code> has length <code>n + 1</code>.</li>
+<li><code>i, j</code>: first and last matrix index of the current subchain.</li>
+<li><code>k</code>: split point; it separates <code>Ai..Ak</code> from <code>A(k+1)..Aj</code>.</li>
+<li><code>q</code>: cost of one candidate split.</li>
+</ul>
+<b>Iterative bottom-up version:</b>
+<pre><code>#include &lt;limits.h&gt;
+
+int matrix_chain_iterative(int d[], int n) {
+    // M[i][j] = minimum cost to multiply Ai ... Aj
+    int M[n + 1][n + 1];
+
+    // split[i][j] = best k where Ai ... Aj should be split
+    int split[n + 1][n + 1];
+
+    // one matrix alone costs 0 multiplications
+    for (int i = 1; i &lt;= n; i++) {
+        M[i][i] = 0;
+    }
+
+    // len is the chain length minus 1, i.e. distance j - i
+    // we solve shorter chains before longer chains
+    for (int len = 1; len &lt;= n - 1; len++) {
+        for (int i = 1; i &lt;= n - len; i++) {
+            // current subproblem: multiply Ai ... Aj
+            int j = i + len;
+            M[i][j] = INT_MAX;
+
+            // try every possible final split position k
+            for (int k = i; k &lt;= j - 1; k++) {
+                // cost = left subchain + right subchain + final multiplication
+                int q = M[i][k] + M[k + 1][j]
+                      + d[i - 1] * d[k] * d[j];
+
+                // keep the cheapest split found so far
+                if (q &lt; M[i][j]) {
+                    M[i][j] = q;
+                    split[i][j] = k;
+                }
+            }
+        }
+    }
+
+    return M[1][n];
+}</code></pre>
+<b>Recursive memoized version:</b>
+<pre><code>#include &lt;limits.h&gt;
+
+int matrix_memo_rec(int d[], int i, int j, int n, int M[n + 1][n + 1]) {
+    // base case: one matrix needs no multiplication
+    if (i == j) {
+        return 0;
+    }
+
+    // if this subproblem was already solved, reuse it
+    if (M[i][j] &lt; INT_MAX) {
+        return M[i][j];
+    }
+
+    // otherwise try all possible split positions k
+    for (int k = i; k &lt;= j - 1; k++) {
+        // recursively solve left and right side of the split
+        int q = d[i - 1] * d[k] * d[j]
+              + matrix_memo_rec(d, i, k, n, M)
+              + matrix_memo_rec(d, k + 1, j, n, M);
+
+        // remember the best cost for Ai ... Aj
+        if (q &lt; M[i][j]) {
+            M[i][j] = q;
+        }
+    }
+
+    return M[i][j];
+}
+
+int matrix_chain_recursive(int d[], int n) {
+    int M[n + 1][n + 1];
+
+    // INT_MAX means &quot;not computed yet&quot;
+    for (int i = 1; i &lt;= n; i++) {
+        for (int j = 1; j &lt;= n; j++) {
+            M[i][j] = INT_MAX;
+        }
+    }
+
+    // solve the full chain A1 ... An
+    return matrix_memo_rec(d, 1, n, n, M);
+}</code></pre>
+<b>Difference:</b>
+<ul>
+<li><b>Iterative DP:</b> fills the table by increasing subproblem length, so every needed value is already available.</li>
+<li><b>Recursive memoization:</b> starts with the full problem and recursively asks for smaller subproblems; each solved value is stored in <code>M</code> so it is not recomputed.</li>
+<li>Both compute the same recurrence and have <code>O(n³)</code> time and <code>O(n²)</code> space.</li>
+</ul>
+</div>
+
+<div class="card">
+<div class="tag">Info2::Dynamic_Programming</div>
+<div class="question"><b>Longest Common Subsequence</b> — What does the LCS of two strings measure? Explain the two cases when comparing the strings. Code the dynamic programming solution in C that returns the length <code>c[m][n]</code>.</div>
+<b>Meaning:</b><br>
+The <b>longest common subsequence</b> measures the length of the longest sequence of characters that appears in both strings in the same order.
+<br><br>
+Important: a subsequence does <b>not</b> have to be contiguous. A substring would have to be contiguous.
+<br><br>
+Example:
+<pre><code>X = ABCBDAB
+Y = BDCABA
+
+BCBA is a common subsequence of length 4.</code></pre>
+<b>DP table:</b><br>
+Let <code>c[i][j]</code> be the LCS length of the prefixes:
+<pre><code>X[0 ... i-1] and Y[0 ... j-1]</code></pre>
+So the final answer is <code>c[m][n]</code>.
+<br><br>
+<b>Variable meanings:</b>
+<ul>
+<li><code>X</code>, <code>Y</code>: the two input strings.</li>
+<li><code>m</code>, <code>n</code>: lengths of <code>X</code> and <code>Y</code>.</li>
+<li><code>i</code>, <code>j</code>: prefix lengths currently compared.</li>
+<li><code>c[i][j]</code>: LCS length of <code>X[0..i-1]</code> and <code>Y[0..j-1]</code>.</li>
+</ul>
+<b>Two cases:</b>
+<ol>
+<li>If the current characters are equal, they can extend the LCS:
+<pre><code>if X[i-1] == Y[j-1]:
+    c[i][j] = c[i-1][j-1] + 1</code></pre></li>
+<li>If they are different, ignore one of the two current characters and take the better result:
+<pre><code>else:
+    c[i][j] = max(c[i-1][j], c[i][j-1])</code></pre></li>
+</ol>
+<b>C code:</b>
+<pre><code>int lcs_length(char X[], int m, char Y[], int n) {
+    // c[i][j] stores the answer for prefixes of length i and j
+    int c[m + 1][n + 1];
+
+    // empty Y: LCS length is 0
+    for (int i = 0; i &lt;= m; i++) {
+        c[i][0] = 0;
+    }
+
+    // empty X: LCS length is 0
+    for (int j = 0; j &lt;= n; j++) {
+        c[0][j] = 0;
+    }
+
+    // fill the table from small prefixes to large prefixes
+    for (int i = 1; i &lt;= m; i++) {
+        for (int j = 1; j &lt;= n; j++) {
+            // X[i-1] and Y[j-1] are the current last characters
+            if (X[i - 1] == Y[j - 1]) {
+                // same character: extend the LCS of the smaller prefixes
+                c[i][j] = c[i - 1][j - 1] + 1;
+            } else if (c[i - 1][j] &gt;= c[i][j - 1]) {
+                // different characters: ignore X[i-1]
+                c[i][j] = c[i - 1][j];
+            } else {
+                // different characters: ignore Y[j-1]
+                c[i][j] = c[i][j - 1];
+            }
+        }
+    }
+
+    // answer for the full strings X and Y
+    return c[m][n];
+}</code></pre>
+<b>Complexity:</b> <code>O(mn)</code> time and <code>O(mn)</code> space.
+</div>
+
+<div class="card">
+<div class="tag">Info2::Dynamic_Programming</div>
+<div class="question"><b>Coin Change DP</b> — Given an amount <code>A</code> and <code>m</code> denominations, how do we change <code>A</code> with as few coins as possible? Explain the three possible cases and give a dynamic programming solution in C.</div>
+<b>Problem:</b><br>
+Given an amount <code>A</code> and coin denominations
+<pre><code>coin[0], coin[1], ..., coin[m-1]</code></pre>
+find the minimum number of coins needed to make exactly amount <code>A</code>.
+<br><br>
+<b>Three possible cases:</b>
+<ol>
+<li><b>No solution:</b> The amount cannot be built from the given coins. Example: <code>A = 3</code>, coins <code>{2}</code>.</li>
+<li><b>Greedy is optimal:</b> Always taking the largest possible coin gives the best answer. Many real currencies are designed like this.</li>
+<li><b>Need DP:</b> Greedy can fail. Example: <code>A = 12</code>, coins <code>{10, 6, 1}</code>. Greedy gives <code>10 + 1 + 1</code> = 3 coins, but the optimum is <code>6 + 6</code> = 2 coins.</li>
+</ol>
+<b>DP idea:</b><br>
+Let <code>dp[a]</code> be the minimum number of coins needed for amount <code>a</code>.
+<pre><code>dp[0] = 0
+dp[a] = 1 + min(dp[a - coin[i]]) over all usable coins coin[i] &lt;= a</code></pre>
+If <code>dp[A]</code> is still infinity at the end, there is no solution.
+<br><br>
+<b>Variable meanings:</b>
+<ul>
+<li><code>coins[]</code>: array of available coin denominations.</li>
+<li><code>m</code>: number of different denominations.</li>
+<li><code>A</code>: target amount.</li>
+<li><code>a</code>: current amount for which we compute the best answer.</li>
+<li><code>dp[a]</code>: minimum number of coins needed to form amount <code>a</code>.</li>
+<li><code>candidate</code>: number of coins if we use the current coin as the last coin.</li>
+</ul>
+<b>C code:</b>
+<pre><code>#include &lt;limits.h&gt;
+
+int min_coins(int coins[], int m, int A) {
+    // dp[a] = minimum number of coins needed to make amount a
+    int dp[A + 1];
+
+    // amount 0 needs 0 coins
+    dp[0] = 0;
+
+    // all other amounts start as impossible
+    for (int a = 1; a &lt;= A; a++) {
+        dp[a] = INT_MAX;
+    }
+
+    // compute the best answer for every amount from 1 to A
+    for (int a = 1; a &lt;= A; a++) {
+        // try every coin as the last coin used for amount a
+        for (int i = 0; i &lt; m; i++) {
+            int coin = coins[i];
+
+            // coin must fit, and the remaining amount must be solvable
+            if (coin &lt;= a &amp;&amp; dp[a - coin] != INT_MAX) {
+                int candidate = dp[a - coin] + 1;
+
+                // keep the solution with the fewest coins
+                if (candidate &lt; dp[a]) {
+                    dp[a] = candidate;
+                }
+            }
+        }
+    }
+
+    // still infinity means no combination of coins makes A
+    if (dp[A] == INT_MAX) {
+        return -1;   // no solution
+    }
+
+    // minimum number of coins for the target amount
+    return dp[A];
+}</code></pre>
+<b>Complexity:</b> <code>O(A · m)</code> time and <code>O(A)</code> space.
+</div>
+
+<div class="card">
+<div class="tag">Info2::Dynamic_Programming</div>
+<div class="question"><b>Exam 25 DP — Nearest Zero in a Matrix</b> — Given an <code>m × n</code> integer matrix <code>M</code>, compute for every cell the Manhattan distance to the nearest zero. Explain and code <code>nD</code> for zeros in the north, and <code>D</code> for zeros in all directions. The solution must run in <code>O(mn)</code>.</div>
+<b>Problem:</b><br>
+For each position <code>[i, j]</code>, we want the distance to the closest cell <code>[p, q]</code> with <code>M[p][q] == 0</code>. The distance is:
+<pre><code>|p - i| + |q - j|</code></pre>
+We store the answers in a matrix <code>S</code> with the same dimensions as <code>M</code>.
+<br><br>
+<b>Idea for <code>nD</code>:</b><br>
+If we only look <b>north</b> in the same column, then every cell depends only on the cell directly above it:
+<ul>
+<li>If <code>M[i][j] == 0</code>, the distance is <code>0</code>.</li>
+<li>If we are in the first row and the cell is not zero, there is no zero above it, so we store infinity.</li>
+<li>Otherwise the nearest northern zero is one step farther than the nearest northern zero from <code>[i-1, j]</code>.</li>
+</ul>
+<b>Variable meanings:</b>
+<ul>
+<li><code>M</code>: input matrix.</li>
+<li><code>S</code>: solution matrix; <code>S[i][j]</code> stores the best distance found for cell <code>[i,j]</code>.</li>
+<li><code>m</code>, <code>n</code>: number of rows and columns.</li>
+<li><code>i</code>, <code>j</code>: current row and column.</li>
+<li><code>INF</code>: a value larger than any possible Manhattan distance in the matrix.</li>
+</ul>
+<b>C code for north only:</b>
+<pre><code>#define INF (m + n)
+
+void nD(int m, int n, int M[m][n], int S[m][n]) {
+    // Scan rows from top to bottom.
+    // This direction is important because S[i-1][j] must already be known.
+    for (int i = 0; i &lt; m; i++) {
+        // Scan every column in the current row.
+        for (int j = 0; j &lt; n; j++) {
+            // Case 1: the current cell itself is zero.
+            if (M[i][j] == 0) {
+                // Distance from a zero cell to itself is 0.
+                S[i][j] = 0;
+            } else if (i == 0) {
+                // Case 2: first row and not zero.
+                // There cannot be any zero north of this cell.
+                S[i][j] = INF;
+            } else {
+                // Case 3: use the cell directly above.
+                // If the nearest northern zero above [i-1,j] has distance d,
+                // then from [i,j] it is one step farther.
+                S[i][j] = S[i - 1][j] + 1;
+            }
+        }
+    }
+}</code></pre>
+<b>Idea for <code>D</code> in all directions:</b><br>
+A shortest path to a zero can approach a cell from north, south, west, or east. We therefore do several linear passes over the matrix and relax the value from neighboring cells:
+<ol>
+<li>Top to bottom: distances from the north.</li>
+<li>Bottom to top: distances from the south.</li>
+<li>Left to right: distances from the west.</li>
+<li>Right to left: distances from the east.</li>
+</ol>
+Each pass uses the rule:
+<pre><code>S[current] = min(S[current], S[neighbor] + 1)</code></pre>
+<b>C code for all directions:</b>
+<pre><code>int min(int a, int b) {
+    // Return the smaller of two candidate distances.
+    return a &lt; b ? a : b;
+}
+
+void D(int m, int n, int M[m][n], int S[m][n]) {
+    // maximum useful distance is at most m + n - 2,
+    // so m + n works as infinity
+    int INF = m + n;
+
+    // ----- pass 1: top to bottom -----
+    // Initialize S with distances to zeros in the north direction.
+    for (int i = 0; i &lt; m; i++) {
+        for (int j = 0; j &lt; n; j++) {
+            // A zero cell is always distance 0 from the nearest zero.
+            if (M[i][j] == 0) {
+                S[i][j] = 0;
+            } else if (i == 0 || S[i - 1][j] == INF) {
+                // If we are in row 0, there is no northern neighbor.
+                // Or if the cell above has no northern zero, neither do we.
+                S[i][j] = INF;
+            } else {
+                // Otherwise, the best northern zero is one step above us.
+                S[i][j] = S[i - 1][j] + 1;
+            }
+        }
+    }
+
+    // ----- pass 2: bottom to top -----
+    // Improve S using possible zeros south of each cell.
+    for (int i = m - 2; i &gt;= 0; i--) {
+        for (int j = 0; j &lt; n; j++) {
+            // If the cell below has distance d, then this cell can reach
+            // the same zero with distance d + 1.
+            S[i][j] = min(S[i][j], S[i + 1][j] + 1);
+        }
+    }
+
+    // ----- pass 3: left to right -----
+    // Improve S using possible zeros west of each cell.
+    for (int j = 1; j &lt; n; j++) {
+        for (int i = 0; i &lt; m; i++) {
+            // If the left neighbor has distance d, current cell can reach
+            // that zero with distance d + 1.
+            S[i][j] = min(S[i][j], S[i][j - 1] + 1);
+        }
+    }
+
+    // ----- pass 4: right to left -----
+    // Improve S using possible zeros east of each cell.
+    for (int j = n - 2; j &gt;= 0; j--) {
+        for (int i = 0; i &lt; m; i++) {
+            // If the right neighbor has distance d, current cell can reach
+            // that zero with distance d + 1.
+            S[i][j] = min(S[i][j], S[i][j + 1] + 1);
+        }
+    }
+}</code></pre>
+<b>Complexity:</b> four passes over the matrix, so <code>O(mn)</code> time and <code>O(1)</code> extra space besides the output matrix <code>S</code>.
+</div>
+
+<div class="card">
+<div class="tag">Info2::Dynamic_Programming</div>
+<div class="question"><b>Exam 24 DP — Maximum Product Subarray</b> — Given an array <code>A</code> with <code>n</code> integers, find the contiguous subarray with the largest product. Explain the DP idea and write <code>int psub(int A[], int n)</code> in C in <code>O(n)</code>.</div>
+<b>Problem:</b><br>
+Find indices <code>i..j</code> such that the product
+<pre><code>A[i] * A[i+1] * ... * A[j]</code></pre>
+is as large as possible.
+<br><br>
+<b>Key idea:</b><br>
+For sums, it is enough to remember the best subarray ending at <code>i</code>. For products, negative numbers make this trickier:
+<ul>
+<li>A large positive product times a negative number becomes a large negative product.</li>
+<li>A very small negative product times a negative number can become the new maximum.</li>
+</ul>
+So we keep two DP values:
+<ul>
+<li><code>max_end</code>: maximum product of a subarray ending at the current position.</li>
+<li><code>min_end</code>: minimum product of a subarray ending at the current position.</li>
+</ul>
+For every <code>A[i]</code>, the best/worst product ending there is one of:
+<pre><code>A[i]
+max_end * A[i]
+min_end * A[i]</code></pre>
+<b>Variable meanings:</b>
+<ul>
+<li><code>A[]</code>: input array.</li>
+<li><code>n</code>: number of elements in <code>A</code>.</li>
+<li><code>x</code>: current value <code>A[i]</code>.</li>
+<li><code>max_end</code>: maximum product of a contiguous subarray ending at the current index.</li>
+<li><code>min_end</code>: minimum product of a contiguous subarray ending at the current index.</li>
+<li><code>best</code>: best product found anywhere so far.</li>
+</ul>
+<b>C code:</b>
+<pre><code>int max3(int a, int b, int c) {
+    // First compare a and b.
+    // m is the larger of those first two values.
+    int m = a &gt; b ? a : b;
+
+    // Now compare that temporary maximum with c.
+    // The result is the maximum of all three values.
+    return m &gt; c ? m : c;
+}
+
+int min3(int a, int b, int c) {
+    // First compare a and b.
+    // m is the smaller of those first two values.
+    int m = a &lt; b ? a : b;
+
+    // Now compare that temporary minimum with c.
+    // The result is the minimum of all three values.
+    return m &lt; c ? m : c;
+}
+
+int psub(int A[], int n) {
+    // At index 0, the only subarray ending here is [A[0]].
+    // Therefore the maximum product ending here is A[0].
+    int max_end = A[0];
+
+    // Same for the minimum product ending here.
+    // We keep this because multiplying by a negative can turn min into max.
+    int min_end = A[0];
+
+    // best stores the best product over ALL subarrays seen so far.
+    int best = A[0];
+
+    // Process every later element once from left to right.
+    for (int i = 1; i &lt; n; i++) {
+        // x is the current array value A[i].
+        // It may start a new subarray or extend a previous one.
+        int x = A[i];
+
+        // Save old values before overwriting max_end/min_end.
+        // Both new states depend on BOTH previous states.
+        int old_max = max_end;
+        int old_min = min_end;
+
+        // Compute the maximum product of a subarray ending at i.
+        // Option 1: start a new subarray with x.
+        // Option 2: extend previous max product by x.
+        // Option 3: extend previous min product by x.
+        max_end = max3(x, old_max * x, old_min * x);
+
+        // Compute the minimum product ending at i.
+        // This is needed because a negative x can turn a very negative
+        // product into a very large positive product later.
+        min_end = min3(x, old_max * x, old_min * x);
+
+        // If the best subarray ending at i is better than the global best,
+        // update the global answer.
+        if (max_end &gt; best) {
+            best = max_end;
+        }
+    }
+
+    // best is the largest product over all contiguous subarrays.
+    return best;
+}</code></pre>
+<b>Complexity:</b> <code>O(n)</code> time and <code>O(1)</code> extra space.
+</div>
+
+<div class="card">
+<div class="tag">Info2::Dynamic_Programming</div>
+<div class="question"><b>Exam 23 DP — Edit Distance</b> — Given strings <code>X[0..n-1]</code> and <code>Y[0..m-1]</code>, compute the minimum number of insertions, deletions, and substitutions needed to transform <code>X</code> into <code>Y</code>. Write <code>int ed(char X[], int n, char Y[], int m)</code>.</div>
+<b>Problem:</b><br>
+The edit distance is the minimum number of operations needed to change <code>X</code> into <code>Y</code>. Allowed operations:
+<ul>
+<li><b>Insert</b> a character into <code>X</code>.</li>
+<li><b>Delete</b> a character from <code>X</code>.</li>
+<li><b>Substitute</b> one character of <code>X</code> by another character.</li>
+</ul>
+<b>DP idea:</b><br>
+Let <code>DP[i][j]</code> be the edit distance between the prefixes:
+<pre><code>X[0..i-1] and Y[0..j-1]</code></pre>
+Base cases:
+<ul>
+<li><code>DP[i][0] = i</code>: delete all <code>i</code> characters of <code>X</code>.</li>
+<li><code>DP[0][j] = j</code>: insert all <code>j</code> characters of <code>Y</code>.</li>
+</ul>
+Transition:
+<ul>
+<li>If <code>X[i-1] == Y[j-1]</code>, no operation is needed for the last character.</li>
+<li>Otherwise take the minimum of delete, insert, and substitute.</li>
+</ul>
+<b>Variable meanings:</b>
+<ul>
+<li><code>X</code>, <code>Y</code>: source and target string.</li>
+<li><code>n</code>, <code>m</code>: lengths of <code>X</code> and <code>Y</code>.</li>
+<li><code>i</code>, <code>j</code>: prefix lengths currently compared.</li>
+<li><code>DP[i][j]</code>: edit distance between <code>X[0..i-1]</code> and <code>Y[0..j-1]</code>.</li>
+<li><code>del</code>, <code>ins</code>, <code>sub</code>: costs for delete, insert, and substitute.</li>
+</ul>
+<b>C code:</b>
+<pre><code>int min(int a, int b) {
+    // Compare two candidate edit costs.
+    // The smaller one is the better edit sequence.
+    return a &lt; b ? a : b;
+}
+
+int ed(char X[], int n, char Y[], int m) {
+    // DP[i][j] = edit distance between first i chars of X
+    //            and first j chars of Y
+    int DP[n + 1][m + 1];
+
+    // Base case:
+    // empty X prefix to empty Y prefix needs 0 operations.
+    DP[0][0] = 0;
+
+    // First column:
+    // To transform X[0..i-1] into the empty string,
+    // delete all i characters.
+    for (int i = 1; i &lt;= n; i++) {
+        // One more character in X means one more deletion.
+        DP[i][0] = DP[i - 1][0] + 1;
+    }
+
+    // First row:
+    // To transform the empty string into Y[0..j-1],
+    // insert all j characters.
+    for (int j = 1; j &lt;= m; j++) {
+        // One more character in Y means one more insertion.
+        DP[0][j] = DP[0][j - 1] + 1;
+    }
+
+    // Fill the table from small prefixes to large prefixes.
+    for (int i = 1; i &lt;= n; i++) {
+        for (int j = 1; j &lt;= m; j++) {
+            // Compare the last characters of the current prefixes.
+            if (X[i - 1] == Y[j - 1]) {
+                // Last characters already match.
+                // No new operation is needed, so copy the diagonal value.
+                DP[i][j] = DP[i - 1][j - 1];
+            } else {
+                // Option 1: delete X[i-1].
+                // Then we still need to transform X[0..i-2] into Y[0..j-1].
+                int del = DP[i - 1][j] + 1;
+
+                // Option 2: insert Y[j-1] into X.
+                // Then we still need to transform X[0..i-1] into Y[0..j-2].
+                int ins = DP[i][j - 1] + 1;
+
+                // Option 3: substitute X[i-1] with Y[j-1].
+                // Then the remaining prefixes are X[0..i-2] and Y[0..j-2].
+                int sub = DP[i - 1][j - 1] + 1;
+
+                // Choose the cheapest of delete, insert, and substitute.
+                DP[i][j] = min(min(del, ins), sub);
+            }
+        }
+    }
+
+    // The bottom-right table cell is the answer for the full strings.
+    return DP[n][m];
+}</code></pre>
+<b>Complexity:</b> <code>O(nm)</code> time and <code>O(nm)</code> space.
+</div>
+
+<div class="card">
+<div class="tag">Info2::Dynamic_Programming</div>
+<div class="question"><b>Exam 22 DP — Minus Process</b> — Given an array <code>A</code> of positive integers, repeatedly remove two values <code>a</code> and <code>b</code>; if <code>a != b</code>, insert <code>|a-b|</code>. Compute the smallest possible final value <code>M</code>. Explain the subset-sum DP and write <code>calculate(A, n)</code>.</div>
+<b>Problem:</b><br>
+The Minus process is equivalent to splitting the numbers into two groups. At the end, the remaining value is the absolute difference between the two group sums.
+<br><br>
+If the total sum is <code>S</code>, the best possible result is obtained by choosing one group with sum as close as possible to <code>S/2</code>. If that group has sum <code>x</code>, the other group has sum <code>S - x</code>, so the final value is:
+<pre><code>(S - x) - x = S - 2x</code></pre>
+We want the largest reachable <code>x &lt;= S/2</code>.
+<br><br>
+<b>DP meaning:</b><br>
+Let <code>dp[i][j]</code> be the maximum sum not larger than <code>j</code> that can be built using the first <code>i</code> elements <code>A[0..i-1]</code>.
+<br><br>
+<b>Variable meanings:</b>
+<ul>
+<li><code>A[]</code>: input array of positive integers.</li>
+<li><code>n</code>: number of elements.</li>
+<li><code>S</code>: total sum of all elements.</li>
+<li><code>half</code>: target upper bound <code>floor(S/2)</code>.</li>
+<li><code>dp[i][j]</code>: best reachable sum <code>&lt;= j</code> using the first <code>i</code> values.</li>
+<li><code>take</code>: result if we put <code>A[i-1]</code> into the selected group.</li>
+<li><code>skip</code>: result if we do not select <code>A[i-1]</code>.</li>
+</ul>
+For element <code>A[i-1]</code>:
+<ul>
+<li>If <code>A[i-1] &lt;= j</code>, either take it or skip it.</li>
+<li>If <code>A[i-1] &gt; j</code>, it cannot be part of the subsequence, so we skip it.</li>
+</ul>
+<b>C code:</b>
+<pre><code>int max(int a, int b) {
+    // Return the larger of two candidate subset sums.
+    return a &gt; b ? a : b;
+}
+
+int calculate(int A[], int n) {
+    // S will store the total sum of all numbers in A.
+    int S = 0;
+
+    // Add every array element to the total sum S.
+    for (int i = 0; i &lt; n; i++) {
+        // Include A[i] in the total.
+        S += A[i];
+    }
+
+    // We only need subset sums up to floor(S / 2).
+    // A subset larger than half would just mirror a smaller subset on the other side.
+    int half = S / 2;
+
+    // dp[i][j] = largest reachable sum &lt;= j
+    // using only the first i elements A[0..i-1].
+    int dp[n + 1][half + 1];
+
+    // First column:
+    // If the allowed sum is 0, the best reachable sum is always 0.
+    for (int i = 0; i &lt;= n; i++) {
+        dp[i][0] = 0;
+    }
+
+    // First row:
+    // With 0 elements, we cannot build any positive sum.
+    // The best reachable sum is therefore 0 for every capacity j.
+    for (int j = 0; j &lt;= half; j++) {
+        dp[0][j] = 0;
+    }
+
+    // Build the table row by row.
+    // Row i means: we may use A[0], ..., A[i-1].
+    for (int i = 1; i &lt;= n; i++) {
+        // Column j means: selected sum may not exceed j.
+        for (int j = 1; j &lt;= half; j++) {
+            // Check whether the current element A[i-1] fits into capacity j.
+            if (j &gt;= A[i - 1]) {
+                // Option 1: take A[i-1].
+                // Then the remaining allowed sum is j - A[i-1].
+                int take = dp[i - 1][j - A[i - 1]] + A[i - 1];
+
+                // Option 2: skip A[i-1].
+                // Then the best value is the one from the previous row.
+                int skip = dp[i - 1][j];
+
+                // Choose the larger reachable sum that still does not exceed j.
+                dp[i][j] = max(take, skip);
+            } else {
+                // A[i-1] is too large to fit into capacity j.
+                // We must skip it and copy the previous row.
+                dp[i][j] = dp[i - 1][j];
+            }
+        }
+    }
+
+    // x is the largest reachable subset sum not larger than S/2.
+    // This makes the two final group sums as balanced as possible.
+    int x = dp[n][half];
+
+    // One group has sum x.
+    // The other group has sum S - x.
+    // The smallest possible final Minus value is their difference.
+    return S - 2 * x;
+}</code></pre>
+<b>Complexity:</b> <code>O(nS)</code> time and <code>O(nS)</code> space, more precisely <code>O(n · floor(S/2))</code>.
+</div>
+
+<!-- ===================== HASH TABLES ===================== -->
+
 <div class="card">
 <div class="tag">Info2::Hash_Tables</div>
 <div class="question"><b>HT</b> — How do you initialize a hash table in C?</div>
-<pre><code>void init_HT(struct hash_table *H, int m) {
+<pre><code>// H : a POINTER to the hash_table we want to initialize.
+//     we pass a pointer (not the struct itself) so the function can
+//     modify the original H — without a pointer it would only edit
+//     a local copy and the caller would see no changes.
+// m : the desired number of slots in the table (e.g. 13).
+void init_HT(struct hash_table *H, int m) {
+
+    // H-&gt;m = m  is shorthand for  (*H).m = m
+    // it writes the value m into the &quot;m&quot; field of the hash_table
+    // struct that H points to.
     H-&gt;m = m;
+
+    // allocate space for m slots on the heap and store the address
+    // of the first slot into H-&gt;table.
+    // after this, H-&gt;table[i] gives direct access to slot i.
     H-&gt;table = malloc(m * sizeof(struct slot));
 
     // every slot must start as EMP, otherwise insert/search/delete
-    // would read uninitialized garbage in the status field
+    // would read uninitialized garbage in the status field.
     for (int i = 0; i &lt; m; i++) {
         H-&gt;table[i].status = EMP;
     }
 }</code></pre>
-<b>Key point:</b> mark every slot as <code>EMP</code> at creation — the algorithms rely on EMP to know "this slot was never used".
+<b>Quick reminder on the arrow syntax:</b>
+<ul>
+<li><code>H</code> is a pointer to a struct.</li>
+<li><code>H-&gt;m</code> means &quot;the field <code>m</code> of the struct that <code>H</code> points to&quot;.</li>
+<li>It is identical to <code>(*H).m</code> — just shorter and more readable.</li>
+</ul>
 </div>
 
 <div class="card">
 <div class="tag">Info2::Hash_Tables</div>
-<div class="question"><b>HT — Chaining</b> — What is the load factor for chaining? What is the search complexity? What is the expected number of probes?</div>
-<b>Chaining:</b> each slot holds a linked list ("chain") of all keys that hash to that slot.
+<div class="question"><b>HT</b> — How do you define a hash function in C? How do you define the hash functions for <b>double hashing</b>?</div>
+<b>Single hash function (division method):</b>
+<pre><code>// returns the slot index for key k in a table of size m
+int h(int k, int m) {
+    return k % m;
+}</code></pre>
+<b>Single hash function (multiplication method):</b>
+<pre><code>#include &lt;math.h&gt;
+
+int h(int k, int m) {
+    double A = 0.6180339887;          // Knuth's golden-ratio constant
+    return (int)(m * fmod(k * A, 1)); // floor( m · ( kA mod 1 ) )
+}</code></pre>
+<b>Double hashing — TWO hash functions:</b>
+<pre><code>// primary hash: gives the starting slot
+int h1(int k, int m) {
+    return k % m;
+}
+
+// secondary hash: gives the STEP SIZE between probes.
+// must never return 0 and must be coprime with m.
+// typical choice: 1 + (k mod m'), with m' = m - 1 (or m - 2) prime.
+int h2(int k, int m) {
+    int m_prime = m - 1;              // pick a prime m' &lt; m
+    return 1 + (k % m_prime);
+}
+
+// the i-th probe position for key k
+int probe(int k, int i, int m) {
+    return (h1(k, m) + i * h2(k, m)) % m;
+}</code></pre>
+<b>Reminder:</b> the hash is computed FROM the key (e.g. <code>k = 18, m = 13 → h(k) = 5</code>). The key is what we store; the hash is just the slot index.
+</div>
+
+<div class="card">
+<div class="tag">Info2::Hash_Tables</div>
+<div class="question"><b>HT</b> — Code: define a hash table with <b>chaining</b> for collision resolution in C. Explain the difference between the two common variants (with vs without <code>*</code> on the table).</div>
+<b>The node struct (same for both variants):</b>
+<pre><code>struct node {
+    char name[20];           // the key (could also be int, etc.)
+    struct node *next;       // pointer to the next node in the chain
+};</code></pre>
+
+<b>Variant A — array of POINTERS (the standard chaining setup):</b>
+<pre><code>struct node *HashTable[5000];   // 5000 pointers to nodes</code></pre>
+<ul>
+<li>Each slot is a <b>pointer</b> to the head of a chain, or <code>NULL</code> if the bucket is empty.</li>
+<li>Nodes are allocated on the heap with <code>malloc</code> and linked into a chain via <code>next</code>.</li>
+<li>Empty bucket = <code>HashTable[i] == NULL</code> — easy to check.</li>
+<li>Memory: 5000 × pointer size (≈ 40 KB on a 64-bit system, regardless of how many keys are stored).</li>
+</ul>
+
+<b>Variant B — array of NODES (no <code>*</code>):</b>
+<pre><code>struct node HashTable[5000];   // 5000 actual node structs, inline</code></pre>
+<ul>
+<li>Each slot is an <b>actual node struct</b> stored directly in the array — <code>name</code> and <code>next</code> live inline.</li>
+<li>You need a sentinel to mark empty buckets (e.g. <code>name[0] == '\0'</code>), because there is no &quot;NULL slot&quot; — every slot is already a full struct.</li>
+<li>Additional collided keys still need <code>malloc</code> and are linked via the embedded <code>next</code> pointer.</li>
+<li>Memory: 5000 × sizeof(struct node) (much larger up front, e.g. ~140 KB), even if most buckets are empty.</li>
+</ul>
+
+<b>Typical insertion (variant A — &quot;insert at head&quot;):</b>
+<pre><code>void insert_chain(struct node *HashTable[], int idx, struct node *new_node) {
+    new_node-&gt;next  = HashTable[idx];   // new node points to old head
+    HashTable[idx]  = new_node;          // new node becomes the new head
+}</code></pre>
+
+<b>Which one to use?</b> Almost always <b>Variant A</b> (array of pointers): cheaper memory when buckets are mostly empty, cleaner empty-bucket check, no risk of confusing &quot;inline slot&quot; with &quot;chain node&quot;.
+</div>
+
+<div class="card">
+<div class="tag">Info2::Hash_Tables</div>
+<div class="question"><b>HT — Chaining</b> — What is the load factor for chaining? What is the search complexity? What is the expected number of probes? <b>Bonus:</b> what benefits and disadvantages would you expect by using a <i>binary search tree</i> instead of a linked list to handle hash-table overflows?</div>
+<b>Chaining:</b> each slot holds a linked list (&quot;chain&quot;) of all keys that hash to that slot.
 <br><br>
 <b>Load factor:</b>
 <pre><code>α = n / m</code></pre>
@@ -2772,11 +3735,27 @@ where <code>n</code> = number of stored keys and <code>m</code> = number of buck
 <li><b>Unsuccessful search:</b> <code>≈ α</code> (must walk the full chain).</li>
 <li><b>Successful search:</b> <code>≈ 1 + α / 2</code> (on average we find the key in the middle of the chain).</li>
 </ul>
+<br>
+<b>Bonus — BST instead of linked list for the chains:</b>
+<br><br>
+<b>Benefits:</b>
+<ul>
+<li><b>Faster lookup inside a heavy bucket:</b> a linked list takes <code>O(chain length)</code>, a balanced BST (e.g. AVL) takes <code>O(log(chain length))</code>.</li>
+<li><b>Much better worst case:</b> if every key collides into one bucket, the worst case drops from <code>O(n)</code> to <code>O(log n)</code>.</li>
+<li><b>Ordered traversal inside a bucket</b> becomes possible (useful for range queries).</li>
+</ul>
+<b>Disadvantages:</b>
+<ul>
+<li><b>More memory per node:</b> instead of one <code>next</code> pointer, a BST node needs <code>left</code>, <code>right</code> (and a height field for AVL).</li>
+<li><b>More code complexity:</b> insertion, deletion and (for AVL) rebalancing must be implemented per bucket.</li>
+<li><b>Pointless if α is small:</b> when chains are short (e.g. average length 1–2), the constant overhead of trees costs more than it saves — a plain list wins in practice.</li>
+</ul>
+<b>Rule of thumb:</b> use trees as the bucket structure only when collisions are very heavy (e.g. Java's <code>HashMap</code> switches a bucket from a linked list to a red-black tree once the bucket has &gt; 8 entries).
 </div>
 
 <div class="card">
 <div class="tag">Info2::Hash_Tables</div>
-<div class="question"><b>HT — Open addressing</b> — How does it work (principle)? What is the load factor?</div>
+<div class="question"><b>HT — Open addressing</b> — How does it work (principle)? What is the load factor? How do <b>insert</b>, <b>search</b>, and <b>delete</b> work?</div>
 <b>Principle:</b>
 <ul>
 <li><b>All elements are stored directly in the table array</b> — no linked lists, no chains.</li>
@@ -2792,7 +3771,8 @@ where <code>n</code> = number of stored keys and <code>m</code> = number of buck
 
 <div class="card">
 <div class="tag">Info2::Hash_Tables</div>
-<div class="question"><b>HT</b> — What is the formula for <b>linear probing</b>?</div>
+<div class="question"><b>HT</b> — What is the formula for <b>linear probing</b>? <b>Exercise:</b> insert keys <b>18</b> and <b>44</b> into a HT of size <b>13</b> using <b>linear probing with step size 1</b> and the <b>division method</b>.</div>
+<b>Formula:</b>
 <pre><code>h(k, i) = ( h'(k) + i )  mod  m</code></pre>
 where:
 <ul>
@@ -2802,6 +3782,26 @@ where:
 So we simply check slot <code>h'(k)</code>, then <code>h'(k) + 1</code>, then <code>h'(k) + 2</code>, … (wrapping mod m).
 <br><br>
 <b>Drawback:</b> <b>primary clustering</b> — long runs of occupied slots accumulate and slow down every probe that lands inside them.
+<br><br>
+<b>Exercise — solution (m = 13, h(k) = k mod 13):</b>
+<br><br>
+<b>Step 1: insert k = 18</b>
+<pre><code>h(18, 0) = (18 mod 13 + 0) mod 13 = (5 + 0) mod 13 = 5
+slot 5 is EMP → insert 18 at slot 5.</code></pre>
+
+<b>Step 2: insert k = 44 — first probe</b>
+<pre><code>h(44, 0) = (44 mod 13 + 0) mod 13 = (5 + 0) mod 13 = 5
+slot 5 is now OCC (holds 18) → collision → probe further.</code></pre>
+
+<b>Step 3: insert k = 44 — linear probe with i = 1</b>
+<pre><code>h(44, 1) = (5 + 1) mod 13 = 6
+slot 6 is EMP → insert 44 at slot 6.</code></pre>
+<br>
+<b>Final table:</b>
+<table style=&quot;border-collapse: collapse;&quot;>
+<tr><th>slot</th><th>0</th><th>1</th><th>2</th><th>3</th><th>4</th><th>5</th><th>6</th><th>7</th><th>8</th><th>9</th><th>10</th><th>11</th><th>12</th></tr>
+<tr><td>key</td><td>–</td><td>–</td><td>–</td><td>–</td><td>–</td><td><b>18</b></td><td><b>44</b></td><td>–</td><td>–</td><td>–</td><td>–</td><td>–</td><td>–</td></tr>
+</table>
 </div>
 
 <div class="card">
@@ -2817,7 +3817,8 @@ The probe jumps grow quadratically, which <b>breaks up primary clustering</b>.
 
 <div class="card">
 <div class="tag">Info2::Hash_Tables</div>
-<div class="question"><b>HT</b> — What is the formula for <b>double hashing</b>? What is a good choice for <code>m'</code>?</div>
+<div class="question"><b>HT</b> — What is the formula for <b>double hashing</b>? What is a good choice for <code>m'</code>? <b>Exercise:</b> insert keys <b>18</b> and <b>44</b> with <code>h₁(k) = k mod 13</code> and <code>h₂(k) = 8 − (k mod 8)</code> (table size m = 13).</div>
+<b>Formula:</b>
 <pre><code>h(k, i) = ( h₁(k) + i · h₂(k) )  mod  m</code></pre>
 where <code>h₁</code> is the primary hash function and <code>h₂</code> is a <b>second</b> hash function used as the step size.
 <br><br>
@@ -2828,14 +3829,40 @@ where <code>h₁</code> is the primary hash function and <code>h₂</code> is a 
 </ul>
 <b>Typical choice:</b>
 <pre><code>h₂(k) = 1 + ( k mod m' )</code></pre>
-where <code>m'</code> is slightly smaller than <code>m</code>, e.g. <code>m' = m − 1</code> or <code>m' = m − 2</code>, chosen <b>prime</b>. This guarantees the "coprime with m" requirement.
+where <code>m'</code> is slightly smaller than <code>m</code>, e.g. <code>m' = m − 1</code> or <code>m' = m − 2</code>, chosen <b>prime</b>. This guarantees the &quot;coprime with m&quot; requirement.
 <br><br>
 <b>Why double hashing is the best of the three:</b> different keys with the same <code>h₁(k)</code> get <i>different</i> probe sequences (because their <code>h₂(k)</code> differs) → almost no clustering.
+<br><br>
+<b>Exercise — solution:</b>
+<br><br>
+<b>Step 1: insert k = 18</b>
+<pre><code>h₁(18) = 18 mod 13 = 5
+slot 5 is EMP → insert 18 at slot 5.   (h₂ not needed yet)</code></pre>
+
+<b>Step 2: insert k = 44 — first probe (i = 0)</b>
+<pre><code>h₁(44) = 44 mod 13 = 5
+h(44, 0) = (5 + 0 · h₂(44)) mod 13 = 5
+slot 5 is OCC (holds 18) → collision → probe with i = 1.</code></pre>
+
+<b>Step 3: compute the step size <code>h₂(44)</code></b>
+<pre><code>h₂(44) = 8 − (44 mod 8) = 8 − 4 = 4</code></pre>
+
+<b>Step 4: insert k = 44 — second probe (i = 1)</b>
+<pre><code>h(44, 1) = (h₁(44) + 1 · h₂(44)) mod 13
+         = (5 + 4) mod 13
+         = 9
+slot 9 is EMP → insert 44 at slot 9.</code></pre>
+
+<b>Final table:</b>
+<table style=&quot;border-collapse: collapse;&quot;>
+<tr><th>slot</th><th>0</th><th>1</th><th>2</th><th>3</th><th>4</th><th>5</th><th>6</th><th>7</th><th>8</th><th>9</th><th>10</th><th>11</th><th>12</th></tr>
+<tr><td>key</td><td>–</td><td>–</td><td>–</td><td>–</td><td>–</td><td><b>18</b></td><td>–</td><td>–</td><td>–</td><td><b>44</b></td><td>–</td><td>–</td><td>–</td></tr>
+</table>
 </div>
 
 <div class="card">
 <div class="tag">Info2::Hash_Tables</div>
-<div class="question"><b>HT</b> — Deletion in a hash table: why can we NOT just set a slot to EMP? Code deletion in C.</div>
+<div class="question"><b>HT</b> — Deletion in a hash table: why can we NOT just set a slot to EMP? Code deletion in C. Then extend the algorithm so that deletion not only removes <code>k</code> but also <b>rearranges the other elements as if <code>k</code> had never been inserted</b>.</div>
 <b>Why not just set it to EMP?</b>
 <br><br>
 Because that would break <i>search</i> for other keys that probed past this slot during insertion. Example with linear probing:
@@ -2843,12 +3870,16 @@ Because that would break <i>search</i> for other keys that probed past this slot
 <li>Insert <code>k₁</code> → lands at slot 3.</li>
 <li>Insert <code>k₂</code> with <code>h(k₂) = 3</code> → slot 3 is taken → linear probe → lands at slot 4.</li>
 <li>Now delete <code>k₁</code> and set slot 3 to <code>EMP</code>.</li>
-<li>Search for <code>k₂</code>: hash to slot 3, see <code>EMP</code>, return "not found".<br>
+<li>Search for <code>k₂</code>: hash to slot 3, see <code>EMP</code>, return &quot;not found&quot;.<br>
 But <code>k₂</code> is sitting at slot 4! Bug.</li>
 </ol>
-<b>Solution:</b> use a <b>DEL tombstone</b>. Search treats DEL like OCC (keep probing). Insert treats DEL like EMP (slot can be reused).
-<br><br>
-<b>C code (with linear probing):</b>
+<b>Two solutions to this problem:</b>
+<ol>
+<li><b>Tombstone (DEL):</b> mark the slot as DEL. Search treats DEL like OCC (keeps probing); insert treats DEL like EMP (slot can be reused).</li>
+<li><b>Rehash on delete:</b> mark the slot EMP <i>and</i> re-insert every following element until we hit an EMP slot — so the table looks as if <code>k</code> was never there.</li>
+</ol>
+<br>
+<b>Variant 1 — simple deletion with DEL tombstone:</b>
 <pre><code>// marks the slot of key k as DELETED (tombstone).
 // returns the slot index on success, -1 if k is not in the table.
 int hash_delete(struct hash_table *H, int k) {
@@ -2868,6 +3899,55 @@ int hash_delete(struct hash_table *H, int k) {
     }
     return -1;   // searched the whole table, key not found
 }</code></pre>
+<br>
+<b>Variant 2 — deletion with rehashing (no DEL state needed).</b><br>
+<b>Step-by-step logic:</b>
+<ol>
+<li>Find the slot <code>j</code> that holds <code>k</code> (standard search). Mark it <code>EMP</code>.</li>
+<li>Walk forward through the probe sequence: <code>j+1, j+2, …</code> (mod m), until you hit an <code>EMP</code> slot.</li>
+<li>Every <code>OCC</code> slot you visit on the way might have ended up where it is only because <code>k</code> was blocking an earlier slot. So: <b>lift it out</b> (save the key, mark the slot EMP) and <b>re-insert it</b>.</li>
+<li>To keep the loop terminating, do this in two passes: first <i>collect &amp; empty</i> every OCC slot up to the next EMP, then re-insert all collected keys.</li>
+<li>Result: the table is exactly what it would have been if <code>k</code> had never been inserted — and we never need a DEL state.</li>
+</ol>
+<pre><code>// deletes k and then rehashes every element that came after k in
+// k's probe path, so the table looks as if k had never been inserted.
+int hash_delete_rehash(struct hash_table *H, int k) {
+    // 1) find the slot of k (standard search)
+    int j = -1;
+    for (int i = 0; i &lt; H-&gt;m; i++) {
+        int idx = (h(k) + i) % H-&gt;m;
+        if (H-&gt;table[idx].status == EMP) return -1;
+        if (H-&gt;table[idx].status == OCC &amp;&amp; H-&gt;table[idx].key == k) {
+            j = idx;
+            break;
+        }
+    }
+    if (j == -1) return -1;
+
+    // 2) plain delete: mark slot j EMP (no tombstone)
+    H-&gt;table[j].status = EMP;
+
+<span style=&quot;color:#ff6b6b;&quot;>    // 3) REARRANGE — collect &amp; empty every OCC slot following j
+    //    (up to the next EMP), then re-insert each saved key.
+    int saved_keys  [H-&gt;m];
+    int saved_values[H-&gt;m];
+    int count = 0;
+    int i = (j + 1) % H-&gt;m;
+    while (H-&gt;table[i].status == OCC) {
+        saved_keys  [count] = H-&gt;table[i].key;
+        saved_values[count] = H-&gt;table[i].value;
+        H-&gt;table[i].status = EMP;
+        count++;
+        i = (i + 1) % H-&gt;m;
+    }
+    // re-insert all collected elements
+    for (int idx = 0; idx &lt; count; idx++) {
+        hash_insert(H, saved_keys[idx], saved_values[idx]);
+    }</span>
+
+    return j;
+}</code></pre>
+<b>Cost:</b> deletion is now O(<i>length of the OCC run after j</i>) instead of O(1), but searches stay simple and there are no tombstones cluttering the table.
 </div>
 
 <div class="card">
@@ -2919,6 +3999,90 @@ int hash_search(struct hash_table *H, int k) {
     return -1;   // searched the whole table, key not found
 }</code></pre>
 <b>Key detail:</b> stop on EMP but <i>never</i> on DEL — that is exactly why we need the DEL tombstone.
+</div>
+
+<div class="card">
+<div class="tag">Info2::Hash_Tables</div>
+<div class="question"><b>HT Exercise — Duplicates / Intersection</b> — You are given two arrays <code>A</code> and <code>B</code> with lengths <code>n</code> and <code>m</code>, containing strictly positive integers. Describe how hash tables can be used to print all elements that appear in both arrays (<code>A ∩ B</code>). Give a short explanation and pseudocode. The algorithm should run in <code>O(n + m)</code>.</div>
+<b>Idea:</b>
+<ul>
+<li>Store all elements of <code>A</code> in a hash table.</li>
+<li>Then scan <code>B</code>. For each <code>B[j]</code>, search it in the hash table.</li>
+<li>If it is found, print it because it appears in both arrays.</li>
+</ul>
+<b>Important detail:</b> if <code>B</code> may contain duplicates and you only want to print each common element once, delete the element from the hash table after printing it. Then later occurrences of the same value in <code>B</code> will not be printed again.
+<br><br>
+<b>Pseudocode:</b>
+<pre><code>void print_intersection(int A[], int n, int B[], int m) {
+    HT H;
+    init_HT(&amp;H);
+
+    // put every element of A into the hash table
+    for (int i = 0; i &lt; n; i++) {
+        insert(&amp;H, A[i]);
+    }
+
+    // check which elements of B also occur in A
+    for (int j = 0; j &lt; m; j++) {
+        if (search(&amp;H, B[j]) != -1) {
+            printf(&quot;%d &quot;, B[j]);
+
+            // optional but useful: prevents printing duplicates
+            // if B contains the same common element several times
+            delete(&amp;H, B[j]);
+        }
+    }
+}</code></pre>
+<b>Complexity argument:</b>
+<ul>
+<li>Building the hash table from <code>A</code>: expected <code>O(n)</code>.</li>
+<li>Scanning <code>B</code> and searching each element: expected <code>O(m)</code>.</li>
+<li>Total expected time: <b><code>O(n + m)</code></b>.</li>
+<li>Extra space: <code>O(n)</code> for the hash table.</li>
+</ul>
+</div>
+
+<div class="card">
+<div class="tag">Info2::Hash_Tables</div>
+<div class="question"><b>HT Exercise — Target Sum</b> — You are given an array <code>A</code> with <code>n</code> strictly positive, distinct integers and a target sum <code>t</code>. Use a hash table to decide whether any two integers in <code>A</code> form the target sum <code>t</code>. Return <code>1</code> if possible and <code>0</code> otherwise. The algorithm should run in <code>O(n)</code>.</div>
+<b>Idea:</b>
+<ul>
+<li>For each element <code>x = A[i]</code>, the partner we need is <code>t − x</code>.</li>
+<li>Use a hash table to remember elements we have already seen.</li>
+<li>Before inserting <code>x</code>, search for <code>t − x</code>.</li>
+<li>If the complement is already in the hash table, we found a valid pair.</li>
+</ul>
+<b>Why search before insert?</b> Because we must use <b>two different elements</b>. If we inserted <code>x</code> first, then for <code>t = 2x</code> we might accidentally match <code>x</code> with itself. The array is distinct, but this order is still the clean invariant.
+<br><br>
+<b>Pseudocode:</b>
+<pre><code>int target_sum(int A[], int n, int t) {
+    HT H;
+    init_HT(&amp;H);
+
+    for (int i = 0; i &lt; n; i++) {
+        int x = A[i];
+        int needed = t - x;
+
+        // have we already seen the required partner?
+        if (search(&amp;H, needed) != -1) {
+            return 1;
+        }
+
+        // remember x for later elements
+        insert(&amp;H, x);
+    }
+
+    return 0;
+}</code></pre>
+<b>Small example:</b> if <code>A = [3, 9, 2, 8]</code> and <code>t = 11</code>, then when <code>x = 2</code>, <code>needed = 9</code>. Since 9 was inserted earlier, return <code>1</code>.
+<br><br>
+<b>Complexity argument:</b>
+<ul>
+<li>Each element is searched once and inserted once.</li>
+<li>Hash table operations are expected <code>O(1)</code>.</li>
+<li>Total expected time: <b><code>O(n)</code></b>.</li>
+<li>Extra space: <code>O(n)</code>.</li>
+</ul>
 </div>
 
 </body>
